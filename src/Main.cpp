@@ -62,33 +62,11 @@ int main() {
 
         MoveCamera();
 
-        { // Reacting to settings changes
-            if (App::restartRenderer) {
-                ShutDownCurrentRenderer();
-
-                CreateCurrentRenderer();
-
-                App::restartRenderer = false;
-            }
-
-            //if (App::currentRendererType != App::lastRendererType) {
-            //    ShutDownCurrentRenderer();
-
-            //    CreateCurrentRenderer();
-            //}
-
-            //App::lastRendererType = App::currentRendererType;
-        }
-
         { // Rendering
             App::imGui.StartNewFrame();
 
             auto imGuiStartTime = std::chrono::steady_clock::now();
             MainGuiWindow();
-
-            //if (App::currentRendererType != App::lastRendererType) {
-            //    continue;
-            //}
 
             App::timingData.imGuiTime = std::chrono::steady_clock::now() - imGuiStartTime;
 

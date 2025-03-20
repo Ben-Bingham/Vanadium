@@ -8,12 +8,6 @@
 
 namespace Rutile {
     void GeneralSettings() {
-        if (ImGui::Button("Restart Renderer")) {
-            App::restartRenderer = true;
-        }
-
-        ImGui::Separator();
-
         // Select scene
         RadioButtons(
             "Select Scene", 

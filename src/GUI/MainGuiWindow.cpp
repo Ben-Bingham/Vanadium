@@ -4,7 +4,6 @@
 #include "imgui.h"
 #include "RayTracing.h"
 #include "RenderingSettings.h"
-#include "ShadowSettings.h"
 
 #include "SceneObjects.h"
 #include "TimingStatistics.h"
