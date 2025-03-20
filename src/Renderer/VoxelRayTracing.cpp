@@ -59,8 +59,8 @@ namespace Rutile {
             0, 2, 3
         };
 
-        m_VoxelRayTracingShader = std::make_unique<Shader>("assets\\shaders\\renderers\\VoxelRayTracing\\VoxelRayTracing.vert", "assets\\shaders\\renderers\\VoxelRayTracing\\VoxelRayTracing.frag");
-        m_RenderingShader = std::make_unique<Shader>("assets\\shaders\\renderers\\VoxelRayTracing\\Rendering.vert", "assets\\shaders\\renderers\\VoxelRayTracing\\Rendering.frag");
+        m_VoxelRayTracingShader = std::make_unique<Shader>("assets\\shaders\\VoxelRayTracing.vert", "assets\\shaders\\VoxelRayTracing.frag");
+        m_RenderingShader = std::make_unique<Shader>("assets\\shaders\\Rendering.vert", "assets\\shaders\\Rendering.frag");
 
         // Screen Rectangle
         glGenVertexArrays(1, &m_VAO);
