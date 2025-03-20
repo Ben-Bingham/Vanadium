@@ -341,206 +341,6 @@ namespace Rutile {
         Object obj;
     };
 
-    // General design taken from:
-    // https://www.mathworks.com/matlabcentral/fileexchange/21057-3d-bresenham-s-line-generation
-    void VoxelifiyLine(int n, Grid& grid, glm::ivec3 min, glm::ivec3 max, MaterialIndex matIndex) {
-        int x0 = min.x;
-        int y0 = min.y;
-        int z0 = min.z;
-        int x1 = max.x;
-        int y1 = max.y;
-        int z1 = max.z;
-
-        int dx = std::abs(x1 - x0);
-        int sx = x0 < x1 ? 1 : -1;
-
-        int dy = std::abs(y1 - y0);
-        int sy = y0 < y1 ? 1 : -1;
-
-        int dz = std::abs(z1 - z0);
-        int sz = z0 < z1 ? 1 : -1;
-
-        if (dx >= dy && dx >= dz) {
-            int ey = 2 * dy - dx;
-            int ez = 2 * dz - dx;
-            while (true) {
-                if (x0 == x1) break;
-
-                if (x0 >= n || y0 >= n || z0 >= n) break;
-                if (x0 < 0 || y0 < 0 || z0 < 0) break;
-
-                grid.Get(x0, y0, z0).SetBool(true);
-                grid.Get(x0, y0, z0).SetMaterialIndex(matIndex);
-
-                if (ey >= 0) {
-                    y0 += sy;
-                    ey -= 2 * dx;
-                }
-                if (ez >= 0) {
-                    z0 += sz;
-                    ez -= 2 * dx;
-                }
-
-                ey += 2 * dy;
-                ez += 2 * dz;
-
-                x0 += sx;
-            }
-
-        }
-        else if (dy >= dx && dy >= dz) {
-            int ex = 2 * dx - dy;
-            int ez = 2 * dz - dy;
-            while (true) {
-                if (y0 == y1) break;
-
-                if (x0 >= n || y0 >= n || z0 >= n) break;
-                if (x0 < 0 || y0 < 0 || z0 < 0) break;
-
-                grid.Get(x0, y0, z0).SetBool(true);
-                grid.Get(x0, y0, z0).SetMaterialIndex(matIndex);
-
-                if (ex >= 0) {
-                    x0 += sx;
-                    ex -= 2 * dy;
-                }
-                if (ez >= 0) {
-                    z0 += sz;
-                    ez -= 2 * dy;
-                }
-
-                ex += 2 * dx;
-                ez += 2 * dz;
-
-                y0 += sy;
-            }
-
-        }
-        else if (dz >= dx && dz >= dy) {
-            int ex = 2 * dx - dz;
-            int ey = 2 * dy - dz;
-            while (true) {
-                if (z0 == z1) break;
-
-                if (x0 >= n || y0 >= n || z0 >= n) break;
-                if (x0 < 0 || y0 < 0 || z0 < 0) break;
-
-                grid.Get(x0, y0, z0).SetBool(true);
-                grid.Get(x0, y0, z0).SetMaterialIndex(matIndex);
-
-                if (ex >= 0) {
-                    x0 += sx;
-                    ex -= 2 * dz;
-                }
-                if (ey >= 0) {
-                    y0 += sz;
-                    ey -= 2 * dz;
-                }
-
-                ex += 2 * dx;
-                ey += 2 * dy;
-
-                z0 += sz;
-            }
-        }
-    }
-
-    void VoxelifiyTriangle(int n, Grid& grid, glm::ivec3 p0, glm::ivec3 p1, glm::ivec3 p2, MaterialIndex matIndex) {
-        int x0 = p0.x;
-        int y0 = p0.y;
-        int z0 = p0.z;
-        int x1 = p1.x;
-        int y1 = p1.y;
-        int z1 = p1.z;
-
-        int dx = std::abs(x1 - x0);
-        int sx = x0 < x1 ? 1 : -1;
-
-        int dy = std::abs(y1 - y0);
-        int sy = y0 < y1 ? 1 : -1;
-
-        int dz = std::abs(z1 - z0);
-        int sz = z0 < z1 ? 1 : -1;
-
-        if (dx >= dy && dx >= dz) {
-            int ey = 2 * dy - dx;
-            int ez = 2 * dz - dx;
-            while (true) {
-                if (x0 == x1) break;
-
-                if (x0 >= n || y0 >= n || z0 >= n) break;
-
-                VoxelifiyLine(n, grid, glm::ivec3{ x0, y0, z0 }, p2, matIndex);
-
-                if (ey >= 0) {
-                    y0 += sy;
-                    ey -= 2 * dx;
-                }
-                if (ez >= 0) {
-                    z0 += sz;
-                    ez -= 2 * dx;
-                }
-
-                ey += 2 * dy;
-                ez += 2 * dz;
-
-                x0 += sx;
-            }
-
-        }
-        else if (dy >= dx && dy >= dz) {
-            int ex = 2 * dx - dy;
-            int ez = 2 * dz - dy;
-            while (true) {
-                if (y0 == y1) break;
-
-                if (x0 >= n || y0 >= n || z0 >= n) break;
-
-                VoxelifiyLine(n, grid, glm::ivec3{ x0, y0, z0 }, p2, matIndex);
-
-                if (ex >= 0) {
-                    x0 += sx;
-                    ex -= 2 * dy;
-                }
-                if (ez >= 0) {
-                    z0 += sz;
-                    ez -= 2 * dy;
-                }
-
-                ex += 2 * dx;
-                ez += 2 * dz;
-
-                y0 += sy;
-            }
-
-        }
-        else if (dz >= dx && dz >= dy) {
-            int ex = 2 * dx - dz;
-            int ey = 2 * dy - dz;
-            while (true) {
-                if (z0 == z1) break;
-
-                if (x0 >= n || y0 >= n || z0 >= n) break;
-
-                VoxelifiyLine(n, grid, glm::ivec3{ x0, y0, z0 }, p2, matIndex);
-
-                if (ex >= 0) {
-                    x0 += sx;
-                    ex -= 2 * dz;
-                }
-                if (ey >= 0) {
-                    y0 += sz;
-                    ey -= 2 * dz;
-                }
-
-                ex += 2 * dx;
-                ey += 2 * dy;
-
-                z0 += sz;
-            }
-        }
-    }
-
     void VoxelRayTracing::CreateOctree() {
         /*
          *   ---------        ---------
@@ -552,75 +352,27 @@ namespace Rutile {
          *       +Z               +Z
          */
 
-        AABB sceneBoundingBox{ glm::vec3{ -0.1f }, glm::vec3{ 0.1f } };
         constexpr int n = 256;
-
-        for (auto obj : App::scene.objects) {
-            sceneBoundingBox = AABBFactory::Construct(AABBFactory::Construct(obj), sceneBoundingBox);
-        }
-
-        sceneBoundingBox.AddPadding(((sceneBoundingBox.max - sceneBoundingBox.min).length() / n) * 4.0f);
-
-        std::vector<float> distancesFromCenter{ };
-
-        distancesFromCenter.push_back(std::abs(sceneBoundingBox.min.x));
-        distancesFromCenter.push_back(std::abs(sceneBoundingBox.min.y));
-        distancesFromCenter.push_back(std::abs(sceneBoundingBox.min.z));
-
-        distancesFromCenter.push_back(std::abs(sceneBoundingBox.max.x));
-        distancesFromCenter.push_back(std::abs(sceneBoundingBox.max.y));
-        distancesFromCenter.push_back(std::abs(sceneBoundingBox.max.z));
-
-        std::ranges::sort(distancesFromCenter.begin(), distancesFromCenter.end());
-
-        float largestVal = distancesFromCenter.back();
+        float largestVal = 7.0f;
 
         glm::vec3 min{ -largestVal };
         glm::vec3 max{ largestVal };
 
         Grid grid{ n };
-        
-        for (auto obj : App::scene.objects) {
-            auto geo = App::scene.geometryBank[obj.geometry];
-            auto transform = App::scene.transformBank[obj.transform];
-            for (size_t i = 0; i < geo.indices.size(); i += 3) {
-                glm::vec3 p0 = glm::vec3{ transform.matrix * glm::vec4{ geo.vertices[geo.indices[i + 0]].position, 1.0f } };
-                glm::vec3 p1 = glm::vec3{ transform.matrix * glm::vec4{ geo.vertices[geo.indices[i + 1]].position, 1.0f } };
-                glm::vec3 p2 = glm::vec3{ transform.matrix * glm::vec4{ geo.vertices[geo.indices[i + 2]].position, 1.0f } };
 
-                // Here p1-3 are in world space, representing there real coords.
-                // They need to be translated into there voxel coords, ie what voxel do they each corospond to the center of.
-                p0 -= min;
-                p0 /= max.x - min.x;
-                p0 *= n;
+        voxels.clear();
 
-                p1 -= min;
-                p1 /= max.x - min.x;
-                p1 *= n;
-
-                p2 -= min;
-                p2 /= max.x - min.x;
-                p2 *= n;
-
-                int x0 = (int)std::round(p0.x);
-                int y0 = (int)std::round(p0.y);
-                int z0 = (int)std::round(p0.z);
-
-                int x1 = (int)std::round(p1.x);
-                int y1 = (int)std::round(p1.y);
-                int z1 = (int)std::round(p1.z);
-
-                int x2 = (int)std::round(p2.x);
-                int y2 = (int)std::round(p2.y);
-                int z2 = (int)std::round(p2.z);
-
-                VoxelifiyTriangle(n, grid, glm::ivec3{ x0, y0, z0 }, glm::ivec3{ x1, y1, z1 }, glm::ivec3{ x2, y2, z2 }, obj.material);
-                VoxelifiyTriangle(n, grid, glm::ivec3{ x1, y1, z1 }, glm::ivec3{ x2, y2, z2 }, glm::ivec3{ x0, y0, z0 }, obj.material);
-                VoxelifiyTriangle(n, grid, glm::ivec3{ x2, y2, z2 }, glm::ivec3{ x0, y0, z0 }, glm::ivec3{ x1, y1, z1 }, obj.material);
+        for (int x = 0; x < n; ++x) {
+            for (int y = 0; y < n; ++y) {
+                for (int z = 0; z < n; ++z) {
+                    if (y < n / 2) {
+                        grid.Get(x, y, z).SetBool(true);
+                        grid.Get(x, y, z).SetMaterialIndex(1);
+                    }
+                }
             }
         }
 
-        voxels.clear();
         Voxelify(n, grid, voxels, min, max);
 
         m_VoxelRayTracingShader->Bind();
