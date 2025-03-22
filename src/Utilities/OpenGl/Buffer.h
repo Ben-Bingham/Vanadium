@@ -34,5 +34,5 @@ private:
     unsigned int m_Handle{ 0 }
 };
 
-using VBO = GlBuffer<float, GL_ARRAY_BUFFER>;
-using EBO = GlBuffer<unsigned int, GL_ELEMENT_ARRAY_BUFFER>;
+using VertexBufferObject = GlBuffer<float, GL_ARRAY_BUFFER>;
+using ElementBufferObject = GlBuffer<unsigned int, GL_ELEMENT_ARRAY_BUFFER>;
