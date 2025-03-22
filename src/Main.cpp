@@ -20,6 +20,7 @@ void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
 void MouseMovementCallback(GLFWwindow* window, double x, double y);
 
 Camera cam{ };
+bool mouseDown{ false };
 
 std::shared_ptr<Window> window{ };
 
@@ -28,7 +29,6 @@ int main() {
 
     glfwSetFramebufferSizeCallback(window->handle, FramebufferSizeCallback);
     glfwSetCursorPosCallback(window->handle, MouseMovementCallback);
-    glfwSetInputMode(window->handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     Context context{ *window };
    
@@ -120,8 +120,16 @@ int main() {
         ImGui::Text("Hello World!");
         } ImGui::End();
 
+        // Basic interaction
         if (glfwGetKey(window->handle, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
             glfwSetWindowShouldClose(window->handle, true);
+        }
+
+        if (glfwGetMouseButton(window->handle, 0) == GLFW_PRESS) {
+            mouseDown = true;
+        }
+        else {
+            mouseDown = false;
         }
 
         // Camera Movement
@@ -188,6 +196,13 @@ void FramebufferSizeCallback(GLFWwindow* w, int width, int height) {
 
 void MouseMovementCallback(GLFWwindow* window, double x, double y) {
     glm::vec2 pos{ (float)x, (float)y };
+
+    if (!mouseDown) {
+        cam.lastMousePos = pos;
+
+        return;
+    }
+
 
     if (cam.lastMousePos.x == std::numeric_limits<float>::max()) {
         cam.lastMousePos = pos;
