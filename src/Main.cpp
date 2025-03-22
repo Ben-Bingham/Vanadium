@@ -25,6 +25,7 @@ int main() {
 
     glfwSetFramebufferSizeCallback(window.handle, FramebufferSizeCallback);
     glfwSetCursorPosCallback(window.handle, MouseMovementCallback);
+    glfwSetInputMode(window.handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     Context context{ window };
    
@@ -68,6 +69,10 @@ int main() {
         ImGui::Text("Hello World!");
         } ImGui::End();
 
+        if (glfwGetKey(window.handle, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+            glfwSetWindowShouldClose(window.handle, true);
+        }
+
         // Camera Movement
         if (glfwGetKey(window.handle, GLFW_KEY_W) == GLFW_PRESS) {
             cam.position += cam.forward * cam.movementSpeed * dt;
@@ -80,6 +85,12 @@ int main() {
         }
         if (glfwGetKey(window.handle, GLFW_KEY_D) == GLFW_PRESS) {
             cam.position += cam.right * cam.movementSpeed * dt;
+        }
+        if (glfwGetKey(window.handle, GLFW_KEY_SPACE) == GLFW_PRESS) {
+            cam.position += cam.up * cam.movementSpeed * dt;
+        }
+        if (glfwGetKey(window.handle, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+            cam.position -= cam.up * cam.movementSpeed * dt;
         }
 
         // Prep for rendering
