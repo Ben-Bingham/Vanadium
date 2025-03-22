@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -12,9 +13,19 @@
 #include "Utilities/ImGui/ImGuiInstance.h"
 #include "Utilities/OpenGl/VertexAttributeObject.h"
 #include "Utilities/OpenGl/Buffer.h"
+#include "Utilities/Camera.h"
+
+void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
+void MouseMovementCallback(GLFWwindow* window, double x, double y);
+
+Camera cam{ };
 
 int main() {
     Window window{ glm::ivec2{ 1600, 1000 }, "Vanadium"};
+
+    glfwSetFramebufferSizeCallback(window.handle, FramebufferSizeCallback);
+    glfwSetCursorPosCallback(window.handle, MouseMovementCallback);
+
     Context context{ window };
    
     ImGuiInstance imGui{ };
@@ -42,18 +53,41 @@ int main() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
     glEnableVertexAttribArray(0);
 
-    while (!glfwWindowShouldClose(window.handle)) {
-        imGui.StartNewFrame();
+    float lastFrame = 0.0f;
 
+    while (!glfwWindowShouldClose(window.handle)) {
+        float currentFrame = glfwGetTime();
+
+        float dt = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
+        imGui.StartNewFrame();
+        
+        // Show GUI
         { ImGui::Begin("Viewport");
         ImGui::Text("Hello World!");
         } ImGui::End();
 
+        // Camera Movement
+        if (glfwGetKey(window.handle, GLFW_KEY_W) == GLFW_PRESS) {
+            cam.position += cam.forward * cam.movementSpeed * dt;
+        }
+        if (glfwGetKey(window.handle, GLFW_KEY_S) == GLFW_PRESS) {
+            cam.position -= cam.forward * cam.movementSpeed * dt;
+        }
+        if (glfwGetKey(window.handle, GLFW_KEY_A) == GLFW_PRESS) {
+            cam.position -= cam.right * cam.movementSpeed * dt;
+        }
+        if (glfwGetKey(window.handle, GLFW_KEY_D) == GLFW_PRESS) {
+            cam.position += cam.right * cam.movementSpeed * dt;
+        }
+
+        // Prep for rendering
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glm::mat4 model{ 1.0f };
-        glm::mat4 view = glm::lookAt(glm::vec3{ 0.0f, 0.0f, -5.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f });
+        glm::mat4 view = cam.ViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)window.size.x / (float)window.size.y, 0.01f, 100.0f);
 
         glm::mat4 mvp = projection * view * model;
@@ -61,13 +95,47 @@ int main() {
         mainShader.Bind();
         mainShader.SetMat4("mvp", mvp);
 
+        // Render
         glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
 
+        // Finish the GUI frame
         imGui.FinishFrame();
 
+        // Finish the frame
         glfwSwapBuffers(window.handle);
         glfwPollEvents();
     }
 
     imGui.Cleanup();
+}
+
+void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
+    glViewport(0, 0, width, height);
+    // TODO update window size
+}
+
+void MouseMovementCallback(GLFWwindow* window, double x, double y) {
+    glm::ivec2 pos{ (float)x, (float)y };
+
+    if (cam.lastMousePos.x == std::numeric_limits<float>::max()) {
+        cam.lastMousePos = pos;
+    }
+
+    glm::ivec2 posOffset{ pos.x - cam.lastMousePos.x, cam.lastMousePos.y - pos.y };
+
+    cam.lastMousePos = pos;
+
+    posOffset *= cam.lookSensitivity;
+
+    cam.yaw += posOffset.x;
+    cam.pitch += posOffset.y;
+
+    cam.pitch = std::clamp(cam.pitch, -89.0f, 89.0f);
+
+    cam.forward.x = cos(glm::radians(cam.yaw)) * cos(glm::radians(cam.pitch));
+    cam.forward.y = sin(glm::radians(cam.pitch));
+    cam.forward.z = sin(glm::radians(cam.yaw)) * cos(glm::radians(cam.pitch));
+    cam.forward = glm::normalize(cam.forward);
+
+    cam.right = glm::normalize(glm::cross(cam.forward, cam.up));
 }
