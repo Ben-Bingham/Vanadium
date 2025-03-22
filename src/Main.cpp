@@ -39,8 +39,12 @@ int main() {
     };
 
     VertexAttributeObject vao{ };
+
     VertexBufferObject vbo{ vertices };
     ElementBufferObject ebo{ indices };
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+    glEnableVertexAttribArray(0);
 
     while (!glfwWindowShouldClose(context.Window())) {
         imGui.StartNewFrame();
@@ -58,6 +62,7 @@ int main() {
 
         glm::mat4 mvp = projection * view * model;
 
+        mainShader.Bind();
         mainShader.SetMat4("mvp", mvp);
 
         glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
