@@ -50,11 +50,13 @@ project "Vanadium"
 
 	includedirs {
 		"src",
+		"src/Utilities",
 		"3rdParty/GLEW/include",
 		"3rdParty/GLFW/include",
 		"3rdParty/stb",
 		"3rdParty/ImGui/src",
 		"3rdParty/glm",
+		"3rdParty/FastNoise2",
 		
 		-- Assimp
 		"3rdParty/assimp/ConfigurationHeaders/",

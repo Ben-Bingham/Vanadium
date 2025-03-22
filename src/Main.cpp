@@ -1,111 +1,65 @@
+#include <iostream>
+#include <fstream>
+
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+#include "imgui.h"
 
-#include "Settings/App.h"
+#include "Utilities/OpenGl/GLDebug.h"
+#include "Utilities/OpenGl/Texture.h"
+#include "Utilities/OpenGl/SSBO.h"
+#include "Utilities/OpenGl/Shaders/ShaderProgram.h"
 
-#include "renderer/renderer.h"
-#include "renderer/VoxelRayTracing.h"
-
-#include "GUI/MainGUIWindow.h"
-
-#include "Utility/CameraMovement.h"
-#include "Utility/events/Events.h"
-
-using namespace Rutile;
-
-void CreateCurrentRenderer() {
-    App::renderer = std::make_unique<VoxelRayTracing>();
-
-    glfwWindowHint(GLFW_DECORATED, GLFW_TRUE);
-    glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
-
-    App::window = App::renderer->Init();
-
-    for (auto object : App::scene.objects) {
-        App::scene.transformBank[object.transform].CalculateMatrix();
-    }
-
-    App::renderer->LoadScene();
-    App::renderer->SignalSettingsUpdate();
-    App::renderer->ProjectionMatrixUpdate();
-
-    App::glfw.AttachOntoWindow(App::window);
-
-    App::imGui.Init(App::window);
-}
-
-void ShutDownCurrentRenderer() {
-    App::imGui.Cleanup();
-
-    App::glfw.DetachFromWindow(App::window);
-
-    App::renderer->Cleanup(App::window);
-    App::renderer.reset();
-}
+#include "Utilities/ImGui/ImGuiInstance.h"
 
 int main() {
-    App::timingData.startTime = std::chrono::steady_clock::now();
+    glfwInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 
-    App::glfw.Init();
-
-    CreateCurrentRenderer();
-
-    // Main loop
-    while (!glfwWindowShouldClose(App::window)) {
-        auto frameStartTime = std::chrono::steady_clock::now();
-
-        glfwPollEvents();
-        App::eventManager.Distribute();
-
-        MoveCamera();
-
-        { // Rendering
-            App::imGui.StartNewFrame();
-
-            auto imGuiStartTime = std::chrono::steady_clock::now();
-            MainGuiWindow();
-
-            App::timingData.imGuiTime = std::chrono::steady_clock::now() - imGuiStartTime;
-
-            auto renderStartTime = std::chrono::steady_clock::now();
-            App::renderer->Render();
-            App::timingData.renderTime = std::chrono::steady_clock::now() - renderStartTime;
-
-            App::imGui.FinishFrame();
-
-            glfwSwapBuffers(App::window);
-        }
-
-        // Timing the frame
-        App::timingData.frameTime = std::chrono::steady_clock::now() - frameStartTime;
-
-        App::timingData.frameTimes.push_back(App::timingData.frameTime);
-
-        if (App::timingData.frameTimes.size() > App::timingData.rollingAverageLength) {
-            for (size_t i = 0; i < App::timingData.frameTimes.size() - 1; ++i) {
-                App::timingData.frameTimes[i] = App::timingData.frameTimes[i + 1];
-            }
-
-            App::timingData.frameTimes.pop_back();
-        }
-
-        App::timingData.rollingAverageFrameTime = std::chrono::duration<double>{ 0 };
-
-        for (auto& frameTime : App::timingData.frameTimes) {
-            App::timingData.rollingAverageFrameTime += frameTime;
-        }
-
-        App::timingData.rollingAverageFrameTime /= (double)App::timingData.frameTimes.size();
+    GLFWwindow* window = glfwCreateWindow(1600, 1000, "Vanadium", NULL, NULL);
+    if (window == NULL) {
+        std::cout << "Failed to create GLFW window" << std::endl;
+        glfwTerminate();
+        return -1;
     }
 
-    App::imGui.Cleanup();
+    glfwMakeContextCurrent(window);
+    glfwSwapInterval(0);
 
-    App::glfw.DetachFromWindow(App::window);
+    if (glewInit() != GLEW_OK) {
+        std::cout << "Failed to initialize GLEW" << std::endl;
+        return -1;
+    }
 
-    App::renderer->Cleanup(App::window);
+    int flags; glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+    if (flags & GL_CONTEXT_FLAG_DEBUG_BIT) {
+        glEnable(GL_DEBUG_OUTPUT);
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+        glDebugMessageCallback(glDebugOutput, nullptr);
+        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+    }
 
-    App::glfw.Cleanup();
+    ImGuiInstance imGui{ };
+    imGui.Init(window);
+
+    while (!glfwWindowShouldClose(window)) {
+        imGui.StartNewFrame();
+
+        { ImGui::Begin("Viewport");
+        ImGui::Text("Hello World!");
+        } ImGui::End();
+
+        imGui.FinishFrame();
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+
+    imGui.Cleanup();
+
+    glfwTerminate();
 }
