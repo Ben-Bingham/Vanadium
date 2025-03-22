@@ -112,7 +112,9 @@ int main() {
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
-    float lastFrame = 0.0f;
+    glFrontFace(GL_CCW);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
 
     int n = 8;
     std::vector<std::vector<std::vector<bool>>> grid{ };
@@ -120,6 +122,7 @@ int main() {
     const siv::PerlinNoise::seed_type seed = 123456u;
     const siv::PerlinNoise perlin{ seed };
 
+    float lastFrame{ 0.0f };
     float cleanGridTime{ 0.0f };
     while (!glfwWindowShouldClose(window->handle)) {
         float currentFrame = (float)glfwGetTime();
@@ -252,6 +255,8 @@ int main() {
                     glm::mat4 mvp = projection * view * model;
 
                     mainShader.SetMat4("mvp", mvp);
+                    mainShader.SetMat4("model", model);
+                    mainShader.SetVec3("cameraPosition", cam.position);
 
                     // Render
                     glDrawElements(GL_TRIANGLES, (unsigned int)indices.size(), GL_UNSIGNED_INT, nullptr);
