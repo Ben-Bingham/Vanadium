@@ -1,15 +1,15 @@
 #include <iostream>
 #include <fstream>
 
-#include "Utilities/OpenGl/Context.h"
-
 #include "imgui.h"
 
+#include "Utilities/OpenGl/Context.h"
+#include "Utilities/OpenGl/Shader.h"
 #include "Utilities/OpenGl/Texture.h"
 #include "Utilities/OpenGl/SSBO.h"
-#include "Utilities/OpenGl/Shaders/ShaderProgram.h"
-
 #include "Utilities/ImGui/ImGuiInstance.h"
+
+Shader mainProgram{ "assets\\shaders\\main.vert", "assets\\shaders\\main.frag" };
 
 int main() {
     Context context{ "Vanadium" };
@@ -21,6 +21,8 @@ int main() {
 
     ImGuiInstance imGui{ };
     imGui.Init(context.Window());
+
+    mainProgram.Bind();
 
     while (!glfwWindowShouldClose(context.Window())) {
         imGui.StartNewFrame();
