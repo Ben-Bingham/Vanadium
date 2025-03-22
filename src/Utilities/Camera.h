@@ -11,7 +11,7 @@ public:
 
     glm::mat4 ViewMatrix();
 
-    glm::vec3 position{ 0.0f, 0.0f, 5.0f };
+    glm::vec3 position{ 20.0f, 20.0f, 20.0f };
 
     glm::vec3 up{ 0.0f, 1.0f, 0.0f };
     glm::vec3 forward{ 0.0f, 0.0f, -1.0f };

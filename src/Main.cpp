@@ -111,6 +111,16 @@ int main() {
 
     float lastFrame = 0.0f;
 
+    constexpr int n = 16;
+    std::array<std::array<std::array<bool, n>, n>, n> grid{ };
+    for (int x = 0; x < n; ++x) {
+        for (int y = 0; y < n; ++y) {
+            for (int z = 0; z < n; ++z) {
+                grid[x][y][z] = (y <= (3 * n) / 4);
+            }
+        }
+    }
+
     while (!glfwWindowShouldClose(window->handle)) {
         float currentFrame = (float)glfwGetTime();
 
@@ -121,6 +131,8 @@ int main() {
         
         // Show GUI
         { ImGui::Begin("Settings");
+        ImGui::Text("Frame Time: %fms", dt * 1000.0f);
+
         ImGui::Checkbox("Wireframe", &settings.wireframe);
         } ImGui::End();
 
@@ -168,10 +180,11 @@ int main() {
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        constexpr int n = 4;
         for (int x = 0; x < n; ++x) {
             for (int y = 0; y < n; ++y) {
                 for (int z = 0; z < n; ++z) {
+                    if (!grid[x][y][z]) continue;
+
                     glm::mat4 model{ 1.0f };
                     model = glm::translate(model, glm::vec3{ (float)x, (float)y, (float)z });
 
