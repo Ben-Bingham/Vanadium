@@ -111,12 +111,21 @@ int main() {
 
     float lastFrame = 0.0f;
 
-    constexpr int n = 16;
-    std::array<std::array<std::array<bool, n>, n>, n> grid{ };
+    int n = 16;
+    //std::array<std::array<std::array<bool, n>, n>, n> grid{ };
+
+    std::vector<std::vector<std::vector<bool>>> grid{ };
+    grid.resize(n);
+    for (auto & r : grid) {
+        r.resize(n);
+        for (auto& c : r) {
+            c.resize(n);
+        }
+    }
+
     for (int x = 0; x < n; ++x) {
         for (int y = 0; y < n; ++y) {
             for (int z = 0; z < n; ++z) {
-                //grid[x][y][z] = (y <= (3 * n) / 4);
                 grid[x][y][z] = true;
             }
         }
@@ -135,6 +144,26 @@ int main() {
         { ImGui::Begin("Settings");
         ImGui::Text("Frame Time: %fms", dt * 1000.0f);
         ImGui::Text("Time to Clean Grid: %fms", cleanGridTime * 1000.0f);
+
+        if (ImGui::SliderInt("Grid Size", &n, 1, 64)) {
+            grid.clear();
+
+            grid.resize(n);
+            for (auto& r : grid) {
+                r.resize(n);
+                for (auto& c : r) {
+                    c.resize(n);
+                }
+            }
+
+            for (int x = 0; x < n; ++x) {
+                for (int y = 0; y < n; ++y) {
+                    for (int z = 0; z < n; ++z) {
+                        grid[x][y][z] = true;
+                    }
+                }
+            }
+        }
 
         ImGui::Checkbox("Wireframe", &settings.wireframe);
         } ImGui::End();
