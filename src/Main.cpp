@@ -24,6 +24,10 @@ bool mouseDown{ false };
 
 std::shared_ptr<Window> window{ };
 
+struct Settings {
+    bool wireframe{ false };
+} settings;
+
 int main() {
     window = std::make_shared<Window>(glm::ivec2{ 1600, 1000 }, "Vanadium");
 
@@ -116,9 +120,17 @@ int main() {
         imGui.StartNewFrame();
         
         // Show GUI
-        { ImGui::Begin("Viewport");
-        ImGui::Text("Hello World!");
+        { ImGui::Begin("Settings");
+        ImGui::Checkbox("Wireframe", &settings.wireframe);
         } ImGui::End();
+
+        // Settings
+        if (settings.wireframe) {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
+        else {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
 
         // Basic interaction
         if (glfwGetKey(window->handle, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
