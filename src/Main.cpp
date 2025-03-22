@@ -105,9 +105,6 @@ int main() {
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
-    constexpr int n = 16;
-    std::array<std::array<std::array<int, n>, n>, n> grid{ };
-
     float lastFrame = 0.0f;
 
     while (!glfwWindowShouldClose(window->handle)) {
@@ -151,17 +148,25 @@ int main() {
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glm::mat4 model{ 1.0f };
-        glm::mat4 view = cam.ViewMatrix();
-        glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)window->size.x / (float)window->size.y, 0.01f, 100.0f);
+        constexpr int n = 4;
+        for (int x = 0; x < n; ++x) {
+            for (int y = 0; y < n; ++y) {
+                for (int z = 0; z < n; ++z) {
+                    glm::mat4 model{ 1.0f };
+                    model = glm::translate(model, glm::vec3{ (float)x, (float)y, (float)z });
 
-        glm::mat4 mvp = projection * view * model;
+                    glm::mat4 view = cam.ViewMatrix();
+                    glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)window->size.x / (float)window->size.y, 0.01f, 100.0f);
 
-        mainShader.Bind();
-        mainShader.SetMat4("mvp", mvp);
+                    glm::mat4 mvp = projection * view * model;
 
-        // Render
-        glDrawElements(GL_TRIANGLES, (unsigned int)indices.size(), GL_UNSIGNED_INT, nullptr);
+                    mainShader.SetMat4("mvp", mvp);
+
+                    // Render
+                    glDrawElements(GL_TRIANGLES, (unsigned int)indices.size(), GL_UNSIGNED_INT, nullptr);
+                }
+            }
+        }
 
         // Finish the GUI frame
         imGui.FinishFrame();
