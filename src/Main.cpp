@@ -122,6 +122,7 @@ int main() {
         }
     }
 
+    float cleanGridTime{ 0.0f };
     while (!glfwWindowShouldClose(window->handle)) {
         float currentFrame = (float)glfwGetTime();
 
@@ -133,6 +134,7 @@ int main() {
         // Show GUI
         { ImGui::Begin("Settings");
         ImGui::Text("Frame Time: %fms", dt * 1000.0f);
+        ImGui::Text("Time to Clean Grid: %fms", cleanGridTime * 1000.0f);
 
         ImGui::Checkbox("Wireframe", &settings.wireframe);
         } ImGui::End();
@@ -178,6 +180,7 @@ int main() {
         }
 
         // Clean Grid
+        float cleanGridStart = glfwGetTime();
         auto cleanGrid = grid;
 
         for (int x = 0; x < n; ++x) {
@@ -201,6 +204,8 @@ int main() {
                 }
             }
         }
+
+        cleanGridTime = glfwGetTime() - cleanGridStart;
 
         // Prep for rendering
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
