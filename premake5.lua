@@ -50,7 +50,6 @@ project "Vanadium"
 
 	includedirs {
 		"src",
-		"src/Utilities",
 		"3rdParty/GLEW/include",
 		"3rdParty/GLFW/include",
 		"3rdParty/stb",

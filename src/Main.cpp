@@ -8,8 +8,10 @@
 #include "Utilities/OpenGl/Texture.h"
 #include "Utilities/OpenGl/SSBO.h"
 #include "Utilities/ImGui/ImGuiInstance.h"
+#include "Utilities/OpenGl/VertexAttributeObject.h"
 
 Shader mainProgram{ "assets\\shaders\\main.vert", "assets\\shaders\\main.frag" };
+VertexAttributeObject vao{ };
 
 int main() {
     Context context{ "Vanadium" };
