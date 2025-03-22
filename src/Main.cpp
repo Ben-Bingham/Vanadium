@@ -146,14 +146,18 @@ int main() {
             }
 
             for (int x = 0; x < n; ++x) {
-                for (int y = 0; y < n; ++y) {
-                    for (int z = 0; z < n; ++z) {
-                        double noise = perlin.octave2D_01((double)x, (double)z, 1);
-                        noise /= 4.0;
-                        noise += 0.5;
-                        noise *= (double)n;
+                for (int z = 0; z < n; ++z) {
+                    double noise = perlin.octave2D_01((double)x, (double)z, 1);
+                    noise /= 4.0;
+                    noise += 0.5;
+                    noise *= (double)n;
 
-                        grid[x][y][z] = y <= noise;
+                    for (int y = 0; y < n; ++y) {
+                        if (y >= noise) {
+                            break;
+                        }
+
+                        grid[x][y][z] = true;
                     }
                 }
             }
