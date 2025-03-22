@@ -14,15 +14,11 @@
 #include "Utilities/OpenGl/Buffer.h"
 
 int main() {
-    Context context{ "Vanadium" };
-    
-    if (!context.Valid()) {
-        std::cout << "Context creation failed" << std::endl;
-        return -1;
-    }
-
+    Window window{ glm::ivec2{ 1600, 1000 }, "Vanadium"};
+    Context context{ window };
+   
     ImGuiInstance imGui{ };
-    imGui.Init(context.Window());
+    imGui.Init(window.handle);
 
     Shader mainShader{ "assets\\shaders\\main.vert", "assets\\shaders\\main.frag" };
     mainShader.Bind();
@@ -46,7 +42,7 @@ int main() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
     glEnableVertexAttribArray(0);
 
-    while (!glfwWindowShouldClose(context.Window())) {
+    while (!glfwWindowShouldClose(window.handle)) {
         imGui.StartNewFrame();
 
         { ImGui::Begin("Viewport");
@@ -58,7 +54,7 @@ int main() {
 
         glm::mat4 model{ 1.0f };
         glm::mat4 view = glm::lookAt(glm::vec3{ 0.0f, 0.0f, -5.0f }, glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 0.0f, 1.0f, 0.0f });
-        glm::mat4 projection = glm::perspective(glm::radians(60.0f), 16.0f / 10.0f, 0.01f, 100.0f); // TODO aspect
+        glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)window.size.x / (float)window.size.y, 0.01f, 100.0f);
 
         glm::mat4 mvp = projection * view * model;
 
@@ -69,7 +65,7 @@ int main() {
 
         imGui.FinishFrame();
 
-        glfwSwapBuffers(context.Window());
+        glfwSwapBuffers(window.handle);
         glfwPollEvents();
     }
 

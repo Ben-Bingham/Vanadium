@@ -4,21 +4,8 @@
 
 #include "GLDebug.h"
 
-Context::Context(const std::string& windowName) {
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
-
-    m_Window = glfwCreateWindow(1600, 1000, windowName.c_str(), NULL, NULL);
-    if (m_Window == nullptr) {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-    }
-
-    glfwMakeContextCurrent(m_Window);
-    glfwSwapInterval(0);
+Context::Context(const Window& window) {
+    glfwMakeContextCurrent(window.handle);
 
     if (glewInit() != GLEW_OK) {
         std::cout << "Failed to initialize GLEW" << std::endl;
@@ -33,14 +20,4 @@ Context::Context(const std::string& windowName) {
     }
 }
 
-Context::~Context() {
-    glfwTerminate();
-}
-
-bool Context::Valid() {
-    return m_Window != nullptr;
-}
-
-GLFWwindow* Context::Window() {
-	return m_Window;
-}
+Context::~Context() { }
