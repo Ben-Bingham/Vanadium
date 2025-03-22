@@ -17,6 +17,7 @@
 #include "Utilities/OpenGl/VertexAttributeObject.h"
 #include "Utilities/OpenGl/Buffer.h"
 #include "Utilities/Camera.h"
+#include <glm/gtc/type_ptr.hpp>
 
 
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
@@ -30,6 +31,22 @@ std::shared_ptr<Window> window{ };
 struct Settings {
     bool wireframe{ false };
 } settings;
+
+struct DirectionalLight {
+    glm::vec3 direction;
+
+    glm::vec3 ambient;
+    glm::vec3 diffuse;
+    glm::vec3 specular;
+} dirLight;
+
+struct Phong {
+    glm::vec3 ambient;
+    glm::vec3 diffuse;
+    glm::vec3 specular;
+
+    float shininess;
+} phong;
 
 int main() {
     window = std::make_shared<Window>(glm::ivec2{ 1600, 1000 }, "Vanadium");
@@ -116,6 +133,16 @@ int main() {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 
+    dirLight.direction = glm::vec3(-0.2f, 1.0f, 0.2f);
+    dirLight.ambient = glm::vec3(0.7f);
+    dirLight.diffuse = glm::vec3(0.4f);
+    dirLight.specular = glm::vec3(0.2f);
+
+    phong.ambient = glm::vec3(0.5f, 0.4f, 0.7f);
+    phong.diffuse = phong.ambient * 0.8f;
+    phong.specular = phong.ambient * 0.3f;
+    phong.shininess = 32.0;
+
     int n = 8;
     std::vector<std::vector<std::vector<bool>>> grid{ };
 
@@ -167,6 +194,19 @@ int main() {
         }
 
         ImGui::Checkbox("Wireframe", &settings.wireframe);
+
+        ImGui::Text("Directional Light:");
+        ImGui::SliderFloat3("Direction##dirLight", glm::value_ptr(dirLight.direction), -1.0f, 1.0f);
+        ImGui::SliderFloat3("Ambient##dirLight", glm::value_ptr(dirLight.ambient), 0.0f, 1.0f);
+        ImGui::SliderFloat3("Diffuse##dirLight", glm::value_ptr(dirLight.diffuse), 0.0f, 1.0f);
+        ImGui::SliderFloat3("Specular##dirLight", glm::value_ptr(dirLight.specular), 0.0f, 1.0f);
+
+        ImGui::Text("Block material:");
+        ImGui::SliderFloat3("Ambient##phong", glm::value_ptr(phong.ambient), 0.0f, 1.0f);
+        ImGui::SliderFloat3("Diffuse##phong", glm::value_ptr(phong.diffuse), 0.0f, 1.0f);
+        ImGui::SliderFloat3("Specular##phong", glm::value_ptr(phong.specular), 0.0f, 1.0f);
+        ImGui::SliderFloat("Shininess##phong", &phong.shininess, 0.0f, 4096.0f);
+
         } ImGui::End();
 
         // Settings
@@ -257,6 +297,16 @@ int main() {
                     mainShader.SetMat4("mvp", mvp);
                     mainShader.SetMat4("model", model);
                     mainShader.SetVec3("cameraPosition", cam.position);
+
+                    mainShader.SetVec3("dirLight.direction", dirLight.direction);
+                    mainShader.SetVec3("dirLight.ambient", dirLight.ambient);
+                    mainShader.SetVec3("dirLight.diffuse", dirLight.diffuse);
+                    mainShader.SetVec3("dirLight.specular", dirLight.specular);
+
+                    mainShader.SetFloat("phong.shininess", phong.shininess);
+                    mainShader.SetVec3("phong.ambient", phong.ambient);
+                    mainShader.SetVec3("phong.diffuse", phong.diffuse);
+                    mainShader.SetVec3("phong.specular", phong.specular);
 
                     // Render
                     glDrawElements(GL_TRIANGLES, (unsigned int)indices.size(), GL_UNSIGNED_INT, nullptr);
