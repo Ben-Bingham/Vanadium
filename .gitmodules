@@ -4,6 +4,6 @@
 [submodule "3rdParty/glm"]
 	path = 3rdParty/glm
 	url = https://github.com/Ben-Bingham/glm-Rutile.git
-[submodule "3rdParty/FastNoise2"]
-	path = 3rdParty/FastNoise2
-	url = https://github.com/Ben-Bingham/Vanadium-FastNoise2.git
+[submodule "3rdParty/PerlinNoise"]
+	path = 3rdParty/PerlinNoise
+	url = https://github.com/Reputeless/PerlinNoise.git

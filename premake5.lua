@@ -55,7 +55,7 @@ project "Vanadium"
 		"3rdParty/stb",
 		"3rdParty/ImGui/src",
 		"3rdParty/glm",
-		"3rdParty/FastNoise2",
+		"3rdParty/PerlinNoise",
 		
 		-- Assimp
 		"3rdParty/assimp/ConfigurationHeaders/",
