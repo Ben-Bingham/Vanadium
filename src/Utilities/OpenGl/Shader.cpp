@@ -8,27 +8,7 @@
 #include <sstream>
 
 #include <glm/gtc/type_ptr.hpp>
-
-std::string ReadFile(const std::string& path) {
-    std::string out;
-    std::ifstream file;
-
-    file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-    try {
-        file.open(path);
-
-        std::stringstream shaderStream;
-        shaderStream << file.rdbuf();
-
-        file.close();
-        out = shaderStream.str();
-    }
-    catch (std::ifstream::failure& e) {
-        std::cout << "ERROR: Could not successfully read file with path: " << path << "And error: " << e.what() << std::endl;
-    }
-
-    return out;
-}
+#include "Utilities/ReadFile.h"
 
 Shader::Shader(const std::string& vertexShaderPath, const std::string& fragmentShaderPath, const std::string& geometryShaderPath) {
     std::string vertexShaderSource = ReadFile(vertexShaderPath);

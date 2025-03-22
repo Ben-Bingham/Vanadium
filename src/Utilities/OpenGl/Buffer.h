@@ -10,7 +10,7 @@ template<typename T, int BUFFER_TYPE>
 class GlBuffer {
 public:
     GlBuffer(const std::vector<T>& data, unsigned int drawMode = GL_STATIC_DRAW) {
-        glGenBuffers(1, &handle);
+        glGenBuffers(1, &m_Handle);
 
         Bind();
 
@@ -31,7 +31,7 @@ public:
     }
 
 private:
-    unsigned int m_Handle{ 0 }
+    unsigned int m_Handle{ 0 };
 };
 
 using VertexBufferObject = GlBuffer<float, GL_ARRAY_BUFFER>;
