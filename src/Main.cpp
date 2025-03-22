@@ -145,9 +145,10 @@ int main() {
 
     int n = 8;
     std::vector<std::vector<std::vector<bool>>> grid{ };
+    bool remakeGrid{ true };
 
-    const siv::PerlinNoise::seed_type seed = 123456u;
-    const siv::PerlinNoise perlin{ seed };
+    siv::PerlinNoise::seed_type seed = 123456u;
+    siv::PerlinNoise perlin{ seed };
 
     float lastFrame{ 0.0f };
     float cleanGridTime{ 0.0f };
@@ -164,7 +165,42 @@ int main() {
         ImGui::Text("Frame Time: %fms", dt * 1000.0f);
         ImGui::Text("Time to Clean Grid: %fms", cleanGridTime * 1000.0f);
 
-        if (ImGui::SliderInt("Grid Size", &n, 1, 64) || grid.empty()) {
+        if (ImGui::SliderInt("Grid Size", &n, 1, 64)) {
+            remakeGrid = true;
+        }
+
+        ImGui::Separator();
+
+        ImGui::Checkbox("Wireframe", &settings.wireframe);
+
+        ImGui::Separator();
+
+        ImGui::Text("Directional Light:");
+        ImGui::SliderFloat3("Direction##dirLight", glm::value_ptr(dirLight.direction), -1.0f, 1.0f);
+        ImGui::SliderFloat3("Ambient##dirLight", glm::value_ptr(dirLight.ambient), 0.0f, 1.0f);
+        ImGui::SliderFloat3("Diffuse##dirLight", glm::value_ptr(dirLight.diffuse), 0.0f, 1.0f);
+        ImGui::SliderFloat3("Specular##dirLight", glm::value_ptr(dirLight.specular), 0.0f, 1.0f);
+
+        ImGui::Text("Block material:");
+        ImGui::SliderFloat3("Ambient##phong", glm::value_ptr(phong.ambient), 0.0f, 1.0f);
+        ImGui::SliderFloat3("Diffuse##phong", glm::value_ptr(phong.diffuse), 0.0f, 1.0f);
+        ImGui::SliderFloat3("Specular##phong", glm::value_ptr(phong.specular), 0.0f, 1.0f);
+        ImGui::SliderFloat("Shininess##phong", &phong.shininess, 0.0f, 4096.0f);
+
+        ImGui::Separator();
+
+        ImGui::Text("Noise:");
+        int s = (int)seed;
+        if (ImGui::SliderInt("Seed##noise", &s, 0, (int)std::numeric_limits<int>::max() / 4)) {
+            seed = s;
+            perlin.reseed(seed);
+
+            remakeGrid = true;
+        }
+
+        } ImGui::End();
+
+        if (remakeGrid) {
             grid.clear();
 
             grid.resize(n);
@@ -192,22 +228,6 @@ int main() {
                 }
             }
         }
-
-        ImGui::Checkbox("Wireframe", &settings.wireframe);
-
-        ImGui::Text("Directional Light:");
-        ImGui::SliderFloat3("Direction##dirLight", glm::value_ptr(dirLight.direction), -1.0f, 1.0f);
-        ImGui::SliderFloat3("Ambient##dirLight", glm::value_ptr(dirLight.ambient), 0.0f, 1.0f);
-        ImGui::SliderFloat3("Diffuse##dirLight", glm::value_ptr(dirLight.diffuse), 0.0f, 1.0f);
-        ImGui::SliderFloat3("Specular##dirLight", glm::value_ptr(dirLight.specular), 0.0f, 1.0f);
-
-        ImGui::Text("Block material:");
-        ImGui::SliderFloat3("Ambient##phong", glm::value_ptr(phong.ambient), 0.0f, 1.0f);
-        ImGui::SliderFloat3("Diffuse##phong", glm::value_ptr(phong.diffuse), 0.0f, 1.0f);
-        ImGui::SliderFloat3("Specular##phong", glm::value_ptr(phong.specular), 0.0f, 1.0f);
-        ImGui::SliderFloat("Shininess##phong", &phong.shininess, 0.0f, 4096.0f);
-
-        } ImGui::End();
 
         // Settings
         if (settings.wireframe) {
