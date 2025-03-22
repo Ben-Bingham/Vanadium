@@ -7,7 +7,7 @@
 
 class Camera {
 public:
-    Camera(float movementSpeed = 5.0f, float lookSensitivity = 1.0f);
+    Camera(float movementSpeed = 4.0f, float lookSensitivity = 0.4f);
 
     glm::mat4 ViewMatrix();
 

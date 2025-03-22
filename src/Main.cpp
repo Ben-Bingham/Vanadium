@@ -20,17 +20,19 @@ void MouseMovementCallback(GLFWwindow* window, double x, double y);
 
 Camera cam{ };
 
+std::shared_ptr<Window> window{ };
+
 int main() {
-    Window window{ glm::ivec2{ 1600, 1000 }, "Vanadium"};
+    window = std::make_shared<Window>(glm::ivec2{ 1600, 1000 }, "Vanadium");
 
-    glfwSetFramebufferSizeCallback(window.handle, FramebufferSizeCallback);
-    glfwSetCursorPosCallback(window.handle, MouseMovementCallback);
-    glfwSetInputMode(window.handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetFramebufferSizeCallback(window->handle, FramebufferSizeCallback);
+    glfwSetCursorPosCallback(window->handle, MouseMovementCallback);
+    glfwSetInputMode(window->handle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    Context context{ window };
+    Context context{ *window };
    
     ImGuiInstance imGui{ };
-    imGui.Init(window.handle);
+    imGui.Init(window->handle);
 
     Shader mainShader{ "assets\\shaders\\main.vert", "assets\\shaders\\main.frag" };
     mainShader.Bind();
@@ -56,8 +58,8 @@ int main() {
 
     float lastFrame = 0.0f;
 
-    while (!glfwWindowShouldClose(window.handle)) {
-        float currentFrame = glfwGetTime();
+    while (!glfwWindowShouldClose(window->handle)) {
+        float currentFrame = (float)glfwGetTime();
 
         float dt = currentFrame - lastFrame;
         lastFrame = currentFrame;
@@ -69,27 +71,27 @@ int main() {
         ImGui::Text("Hello World!");
         } ImGui::End();
 
-        if (glfwGetKey(window.handle, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-            glfwSetWindowShouldClose(window.handle, true);
+        if (glfwGetKey(window->handle, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+            glfwSetWindowShouldClose(window->handle, true);
         }
 
         // Camera Movement
-        if (glfwGetKey(window.handle, GLFW_KEY_W) == GLFW_PRESS) {
+        if (glfwGetKey(window->handle, GLFW_KEY_W) == GLFW_PRESS) {
             cam.position += cam.forward * cam.movementSpeed * dt;
         }
-        if (glfwGetKey(window.handle, GLFW_KEY_S) == GLFW_PRESS) {
+        if (glfwGetKey(window->handle, GLFW_KEY_S) == GLFW_PRESS) {
             cam.position -= cam.forward * cam.movementSpeed * dt;
         }
-        if (glfwGetKey(window.handle, GLFW_KEY_A) == GLFW_PRESS) {
+        if (glfwGetKey(window->handle, GLFW_KEY_A) == GLFW_PRESS) {
             cam.position -= cam.right * cam.movementSpeed * dt;
         }
-        if (glfwGetKey(window.handle, GLFW_KEY_D) == GLFW_PRESS) {
+        if (glfwGetKey(window->handle, GLFW_KEY_D) == GLFW_PRESS) {
             cam.position += cam.right * cam.movementSpeed * dt;
         }
-        if (glfwGetKey(window.handle, GLFW_KEY_SPACE) == GLFW_PRESS) {
+        if (glfwGetKey(window->handle, GLFW_KEY_SPACE) == GLFW_PRESS) {
             cam.position += cam.up * cam.movementSpeed * dt;
         }
-        if (glfwGetKey(window.handle, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+        if (glfwGetKey(window->handle, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
             cam.position -= cam.up * cam.movementSpeed * dt;
         }
 
@@ -99,7 +101,7 @@ int main() {
 
         glm::mat4 model{ 1.0f };
         glm::mat4 view = cam.ViewMatrix();
-        glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)window.size.x / (float)window.size.y, 0.01f, 100.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)window->size.x / (float)window->size.y, 0.01f, 100.0f);
 
         glm::mat4 mvp = projection * view * model;
 
@@ -107,32 +109,34 @@ int main() {
         mainShader.SetMat4("mvp", mvp);
 
         // Render
-        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, (unsigned int)indices.size(), GL_UNSIGNED_INT, nullptr);
 
         // Finish the GUI frame
         imGui.FinishFrame();
 
         // Finish the frame
-        glfwSwapBuffers(window.handle);
+        glfwSwapBuffers(window->handle);
         glfwPollEvents();
     }
 
     imGui.Cleanup();
 }
 
-void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
+void FramebufferSizeCallback(GLFWwindow* w, int width, int height) {
     glViewport(0, 0, width, height);
-    // TODO update window size
+    
+    window->size.x = width;
+    window->size.y = height;
 }
 
 void MouseMovementCallback(GLFWwindow* window, double x, double y) {
-    glm::ivec2 pos{ (float)x, (float)y };
+    glm::vec2 pos{ (float)x, (float)y };
 
     if (cam.lastMousePos.x == std::numeric_limits<float>::max()) {
         cam.lastMousePos = pos;
     }
 
-    glm::ivec2 posOffset{ pos.x - cam.lastMousePos.x, cam.lastMousePos.y - pos.y };
+    glm::vec2 posOffset{ pos.x - cam.lastMousePos.x, cam.lastMousePos.y - pos.y };
 
     cam.lastMousePos = pos;
 
