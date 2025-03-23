@@ -47,9 +47,6 @@ int main() {
 
     Vanadium::Settings settings{ };
 
-    std::vector<Vanadium::Chunk> chunks{ };
-    std::vector<Vanadium::GlChunk> glChunks{ };
-
     // Texture Atlas
     Texture::Parameters p {
         Texture::Format::RGB,
@@ -81,28 +78,38 @@ int main() {
     phong.specular = phong.ambient * 0.3f;
     phong.shininess = 32.0;
 
-    Vanadium::Chunk chunk{ };
+    // Chunk Creation
+    std::vector<Vanadium::ChunkPosition> desiredChunks{ 
+        Vanadium::ChunkPosition{  0,  0,  0 },
+        Vanadium::ChunkPosition{  1,  0,  0 },
+        Vanadium::ChunkPosition{ -1,  0,  0 },
+        Vanadium::ChunkPosition{  0,  0,  1 },
+        Vanadium::ChunkPosition{  0,  0, -1 }
+    };
+
+    std::vector<Vanadium::Chunk> chunks{ };
+    std::vector<Vanadium::GlChunk> glChunks{ };
 
     int n = 8;
-    chunk.position = glm::ivec3{ 0, 0, 0 };
     bool remakeGrid{ true };
 
-    chunks.push_back(chunk);
+    chunks.resize(desiredChunks.size());
+    glChunks.resize(desiredChunks.size());
 
-    glChunks.resize(1);
-    glChunks[0].vao = std::make_unique<VertexAttributeObject>();
-    glChunks[0].vao->Bind();
-    glChunks[0].vbo = std::make_unique<VertexBufferObject>();
-    glChunks[0].ebo = std::make_unique<ElementBufferObject>();
+    for (auto& chunk : glChunks) {
+        chunk.vao = std::make_unique<VertexAttributeObject>();
+        chunk.vbo = std::make_unique<VertexBufferObject>();
+        chunk.ebo = std::make_unique<ElementBufferObject>();
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
-    glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
+        glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
 
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(6 * sizeof(float)));
+        glEnableVertexAttribArray(2);
+    }
 
     mainShader.Bind();
     mainShader.SetFloat("radius", settings.planetRadius);
@@ -120,11 +127,16 @@ int main() {
         Vanadium::GUI(settings, remakeGrid, n, mainShader, phong, dirLight, dt);
 
         if (remakeGrid) {
-            chunks[0] = Vanadium::GenerateChunk(Vanadium::ChunkPosition{ 1, 0, 0 }, settings, n, 2, 2);
+            size_t i = 0;
+            for (auto& p : desiredChunks) {
+                chunks[i] = Vanadium::GenerateChunk(p, settings, n, 2, 2);
 
-            glChunks[0].vao->Bind();
-            glChunks[0].vbo->UpdateData(Vanadium::VerticesAsFloatVector(chunks[0].geometry.vertices));
-            glChunks[0].ebo->UpdateData(chunks[0].geometry.indices);
+                glChunks[i].vao->Bind();
+                glChunks[i].vbo->UpdateData(Vanadium::VerticesAsFloatVector(chunks[i].geometry.vertices));
+                glChunks[i].ebo->UpdateData(chunks[i].geometry.indices);
+
+                ++i;
+            }
 
             remakeGrid = false;
         }
@@ -171,10 +183,14 @@ int main() {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, atlas.Get());
 
-        glChunks[0].vao->Bind();
-
         // Render
-        glDrawElements(GL_TRIANGLES, (unsigned int)chunks[0].geometry.indices.size(), GL_UNSIGNED_INT, nullptr);
+        size_t i = 0;
+        for (auto& glChunk : glChunks) {
+            glChunk.vao->Bind();
+
+            glDrawElements(GL_TRIANGLES, (unsigned int)chunks[i].geometry.indices.size(), GL_UNSIGNED_INT, nullptr);
+            ++i;
+        }
 
         // Finish the GUI frame
         imGui.FinishFrame();
