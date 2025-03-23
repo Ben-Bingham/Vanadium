@@ -143,8 +143,10 @@ int main() {
     phong.specular = phong.ambient * 0.3f;
     phong.shininess = 32.0;
 
+    using BlockIndex = unsigned char;
+
     int n = 8;
-    std::vector<std::vector<std::vector<bool>>> grid{ };
+    std::vector<std::vector<std::vector<BlockIndex>>> grid{ };
     bool remakeGrid{ true };
 
     siv::PerlinNoise::seed_type seed = 123456u;
@@ -238,10 +240,11 @@ int main() {
 
                     for (int y = 0; y < n; ++y) {
                         if (y > noise) {
+                            grid[x][y][z] = 0;
+
                             break;
                         }
-
-                        grid[x][y][z] = true;
+                        grid[x][y][z] = 1;
                     }
                 }
             }
@@ -288,7 +291,7 @@ int main() {
         }
 
         // Clean Grid
-        float cleanGridStart = glfwGetTime();
+        float cleanGridStart = (float)glfwGetTime();
         auto cleanGrid = grid;
 
         for (int x = 0; x < n; ++x) {
@@ -296,7 +299,7 @@ int main() {
                 for (int z = 0; z < n; ++z) {
                     if (!cleanGrid[x][y][z]) continue;
 
-                    bool px = false, py = false, pz = false, nx = false, ny = false, nz = false;
+                    BlockIndex px = 0, py = 0, pz = 0, nx = 0, ny = 0, nz = 0;
 
                     if (x + 1 < n) px = grid[x + 1][y][z];
                     if (y + 1 < n) py = grid[x][y + 1][z];
@@ -307,13 +310,13 @@ int main() {
                     if (z - 1 >= 0) nz = grid[x][y][z - 1];
 
                     if (px && py && pz && nx && ny && nz) {
-                        cleanGrid[x][y][z] = false;
+                        cleanGrid[x][y][z] = 0;
                     }
                 }
             }
         }
 
-        cleanGridTime = glfwGetTime() - cleanGridStart;
+        cleanGridTime = (float)glfwGetTime() - cleanGridStart;
 
         // Prep for rendering
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
