@@ -150,6 +150,11 @@ int main() {
     siv::PerlinNoise::seed_type seed = 123456u;
     siv::PerlinNoise perlin{ seed };
     int octaves{ 1 };
+    float percentOfBlocksAffected{ 0.25 };
+    float xMult{ 1.0f };
+    float yMult{ 1.0f };
+    float noiseMult{ 1.0f };
+    float noiseOffset{ 0.0f };
 
     float lastFrame{ 0.0f };
     float cleanGridTime{ 0.0f };
@@ -191,9 +196,12 @@ int main() {
             ImGui::Separator();
 
             ImGui::Text("Noise:");
-            if (ImGui::SliderInt("Octaves##noise", &octaves, 1, 64)) {
-                remakeGrid = true;
-            }
+            if (ImGui::SliderInt("Octaves##noise", &octaves, 1, 64)) remakeGrid = true;
+            if (ImGui::SliderFloat("Percentage of Voxels Effected##noise", &percentOfBlocksAffected, 0.0f, 1.0f)) remakeGrid = true;
+            if (ImGui::SliderFloat("X Coordinate Multiplier##noise", &xMult, 0.0f, 10.0f)) remakeGrid = true;
+            if (ImGui::SliderFloat("Y Coordinate Multiplier##noise", &yMult, 0.0f, 10.0f)) remakeGrid = true;
+            if (ImGui::SliderFloat("Noise Multiplier##noise", &noiseMult, 0.0f, 10.0f)) remakeGrid = true;
+            if (ImGui::SliderFloat("Noise Offset##noise", &noiseOffset, -100.0f, 100.0f)) remakeGrid = true;
 
             int s = (int)seed;
             if (ImGui::SliderInt("Seed##noise", &s, 0, (int)std::numeric_limits<int>::max() / 4)) {
@@ -218,13 +226,18 @@ int main() {
 
             for (int x = 0; x < n; ++x) {
                 for (int z = 0; z < n; ++z) {
-                    double noise = perlin.octave2D_01((double)x, (double)z, octaves);
-                    noise /= 4.0;
-                    noise += 0.5;
+                    double noise = perlin.octave2D_01((double)x * (double)xMult, (double)z * (double)yMult, octaves);
+                    noise *= percentOfBlocksAffected;
+                    noise += 1.0;
+                    noise -= percentOfBlocksAffected;
+
+                    noise *= noiseMult;
+                    noise += noiseOffset;
+
                     noise *= (double)n;
 
                     for (int y = 0; y < n; ++y) {
-                        if (y >= noise) {
+                        if (y > noise) {
                             break;
                         }
 
