@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-#include "GridGeneration.h"
+#include "GenerateGrid.h"
 
 namespace Vanadium {
 	using Index = unsigned int;

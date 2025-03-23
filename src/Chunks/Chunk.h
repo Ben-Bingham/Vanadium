@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GenerateGeometry.h"
-#include "GridGeneration.h"
+#include "GenerateGrid.h"
 
 namespace Vanadium {
 	struct Chunk {

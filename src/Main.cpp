@@ -16,7 +16,7 @@
 #include "Utilities/Camera.h"
 
 #include "Chunks/Chunk.h"
-#include "Chunks/GridGeneration.h"
+#include "Chunks/GenerateGrid.h"
 #include "Chunks/CleanGrid.h"
 #include "Chunks/GenerateGeometry.h"
 #include "Settings.h"

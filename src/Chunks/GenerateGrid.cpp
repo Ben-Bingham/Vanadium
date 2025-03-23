@@ -1,4 +1,4 @@
-#include "GridGeneration.h"
+#include "GenerateGrid.h"
 
 namespace Vanadium {
 	Grid CreateGrid(int n, const Settings& settings) {
