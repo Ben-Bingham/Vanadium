@@ -138,6 +138,8 @@ int main() {
     Texture atlas{ "assets\\blocks\\atlas.png", p };
     mainShader.Bind();
     mainShader.SetInt("textureAtlas", 0);
+    mainShader.SetInt("atlasWidth", 2);
+    mainShader.SetInt("atlasHeight", 2);
 
     glFrontFace(GL_CCW);
     glEnable(GL_DEPTH_TEST);
@@ -254,7 +256,18 @@ int main() {
 
                             break;
                         }
-                        grid[x][y][z] = 1;
+
+                        if (y == noise) {
+                            grid[x][y][z] = 1;
+                            continue;
+                        }
+
+                        if (y >= noise - 3) {
+                            grid[x][y][z] = 2;
+                            continue;
+                        }
+
+                        grid[x][y][z] = 3;
                     }
                 }
             }
@@ -358,6 +371,8 @@ int main() {
                     mainShader.SetVec3("phong.ambient", phong.ambient);
                     mainShader.SetVec3("phong.diffuse", phong.diffuse);
                     mainShader.SetVec3("phong.specular", phong.specular);
+
+                    mainShader.SetInt("blockId", cleanGrid[x][y][z]);
 
                     glActiveTexture(GL_TEXTURE0);
                     glBindTexture(GL_TEXTURE_2D, atlas.Get());

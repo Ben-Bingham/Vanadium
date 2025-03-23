@@ -47,7 +47,6 @@ vec3 DirectionalLightAddition(DirectionalLight light, Phong phong, vec3 normal, 
 
     vec3 ambient = texture(textureAtlas, uv).xyz * phong.ambient;
 
-    //vec3 ambient = light.ambient * phong.ambient;
     vec3 diffuse = light.diffuse * diff * phong.diffuse;
     vec3 specular = light.specular * spec * phong.specular;
 
