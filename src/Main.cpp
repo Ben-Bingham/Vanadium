@@ -79,6 +79,8 @@ int main() {
     phong.shininess = 32.0;
 
     // Chunk Creation
+    int n = 8;
+
     std::vector<Vanadium::ChunkPosition> desiredChunks{ 
         Vanadium::ChunkPosition{  0,  0,  0 },
         Vanadium::ChunkPosition{  1,  0,  0 },
@@ -89,12 +91,11 @@ int main() {
 
     std::vector<Vanadium::Chunk> chunks{ };
     std::vector<Vanadium::GlChunk> glChunks{ };
-
-    int n = 8;
-    bool remakeGrid{ true };
+    std::vector<bool> remakeGrid{ };
 
     chunks.resize(desiredChunks.size());
     glChunks.resize(desiredChunks.size());
+    remakeGrid.resize(desiredChunks.size());
 
     for (auto& chunk : glChunks) {
         chunk.vao = std::make_unique<VertexAttributeObject>();
@@ -111,6 +112,10 @@ int main() {
         glEnableVertexAttribArray(2);
     }
 
+    for (size_t i = 0; i < remakeGrid.size(); ++i) {
+        remakeGrid[i] = true;
+    }
+
     mainShader.Bind();
     mainShader.SetFloat("radius", settings.planetRadius);
     mainShader.SetInt("enableCurvature", settings.enableCurvature);
@@ -124,21 +129,25 @@ int main() {
 
         imGui.StartNewFrame();
         
-        Vanadium::GUI(settings, remakeGrid, n, mainShader, phong, dirLight, dt);
+        bool rg = false;
+        Vanadium::GUI(settings, rg, n, mainShader, phong, dirLight, dt);
 
-        if (remakeGrid) {
-            size_t i = 0;
-            for (auto& p : desiredChunks) {
-                chunks[i] = Vanadium::GenerateChunk(p, settings, n, 2, 2);
+        if (rg) {
+            for (size_t i = 0; i < remakeGrid.size(); ++i) {
+                remakeGrid[i] = true;
+            }
+        }
+        
+        for (size_t i = 0; i < remakeGrid.size(); ++i) {
+            if (remakeGrid[i]) {
+                chunks[i] = Vanadium::GenerateChunk(desiredChunks[i], settings, n, 2, 2);
 
                 glChunks[i].vao->Bind();
                 glChunks[i].vbo->UpdateData(Vanadium::VerticesAsFloatVector(chunks[i].geometry.vertices));
                 glChunks[i].ebo->UpdateData(chunks[i].geometry.indices);
 
-                ++i;
+                remakeGrid[i] = false;
             }
-
-            remakeGrid = false;
         }
 
         // Basic interaction
