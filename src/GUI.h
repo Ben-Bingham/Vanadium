@@ -14,7 +14,6 @@ namespace Vanadium {
 		Shader& mainShader,
 		Phong& phong,
 		DirectionalLight& dirLight,
-		float dt, 
-		float cleanGridTime
+		float dt
 	);
 }

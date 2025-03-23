@@ -9,12 +9,18 @@
 template<typename T, int BUFFER_TYPE>
 class GlBuffer {
 public:
-    GlBuffer(const std::vector<T>& data, unsigned int drawMode = GL_STATIC_DRAW) {
+    GlBuffer(const std::vector<T>& data, unsigned int usage = GL_STATIC_DRAW) {
         glGenBuffers(1, &m_Handle);
 
         Bind();
 
-        glBufferData(BUFFER_TYPE, data.size() * sizeof(T), (void*)data.data(), drawMode);
+        glBufferData(BUFFER_TYPE, data.size() * sizeof(T), (void*)data.data(), usage);
+    }
+
+    void UpdateData(const std::vector<T>& data, unsigned int usage = GL_STATIC_DRAW) {
+        Bind();
+
+        glBufferData(BUFFER_TYPE, data.size() * sizeof(T), (void*)data.data(), usage);
     }
 
     GlBuffer(const GlBuffer& other) = delete;

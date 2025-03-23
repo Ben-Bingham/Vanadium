@@ -11,11 +11,10 @@
 
 
 namespace Vanadium {
-	void GUI(Settings& settings, bool& remakeGrid, int& n, Shader& mainShader, Phong& phong, DirectionalLight& dirLight, float dt, float cleanGridTime) {
+	void GUI(Settings& settings, bool& remakeGrid, int& n, Shader& mainShader, Phong& phong, DirectionalLight& dirLight, float dt) {        
         { ImGui::Begin("Settings");
 
             ImGui::Text("Frame Time: %fms", dt * 1000.0f);
-            ImGui::Text("Time to Clean Grid: %fms", cleanGridTime * 1000.0f);
 
             if (ImGui::SliderInt("Grid Size", &n, 1, 64)) {
                 remakeGrid = true;

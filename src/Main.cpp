@@ -19,6 +19,7 @@
 #include "Settings.h"
 #include "GUI.h"
 #include "CleanGrid.h"
+#include "GenerateGeometry.h"
 
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
 void MouseMovementCallback(GLFWwindow* window, double x, double y);
@@ -43,72 +44,6 @@ int main() {
     mainShader.Bind();
 
     Vanadium::Settings settings{ };
-
-    std::vector<float> vertices{
-        -0.5f, -0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   0.0f, 1.0f,
-                                                      
-        -0.5f, -0.5f,  0.5f,    0.0f,  0.0f,  1.0f,   0.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,    0.0f,  0.0f,  1.0f,   1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,    0.0f,  0.0f,  1.0f,   1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,    0.0f,  0.0f,  1.0f,   0.0f, 1.0f,
-                                                      
-        -0.5f,  0.5f,  0.5f,   -1.0f,  0.0f,  0.0f,   1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,   -1.0f,  0.0f,  0.0f,   1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,   -1.0f,  0.0f,  0.0f,   0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,   -1.0f,  0.0f,  0.0f,   0.0f, 0.0f,
-                                                      
-         0.5f,  0.5f,  0.5f,    1.0f,  0.0f,  0.0f,   1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,    1.0f,  0.0f,  0.0f,   1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,    1.0f,  0.0f,  0.0f,   0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,    1.0f,  0.0f,  0.0f,   0.0f, 0.0f,
-                                                      
-        -0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,   0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,   1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,   1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,   0.0f, 0.0f,
-                                                      
-        -0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,   0.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,   1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,    0.0f,  1.0f,  0.0f,   1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,    0.0f,  1.0f,  0.0f,   0.0f, 0.0f
-    };
-
-    std::vector<unsigned int> indices{
-        2,  1,  0,
-        0,  3,  2,
-
-        4,  5,  6,
-        6,  7,  4,
-
-        8,  9, 10,
-        10, 11, 8,
-
-        14, 13, 12,
-        12, 15, 14,
-
-        16, 17, 18,
-        18, 19, 16,
-
-        22, 21, 20,
-        20, 23, 22,
-    };
-
-    VertexAttributeObject vao{ };
-
-    VertexBufferObject vbo{ vertices };
-    ElementBufferObject ebo{ indices };
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
-    glEnableVertexAttribArray(0);
-
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
 
     // Texture Atlas
     Texture::Parameters p {
@@ -147,12 +82,27 @@ int main() {
     Vanadium::Grid grid{ };
     bool remakeGrid{ true };
 
+    Vanadium::Geometry geometry{ };
+
+    VertexAttributeObject geoVAO{ };
+
+    VertexBufferObject geoVBO{ Vanadium::VerticesAsFloatVector(geometry.vertices) };
+    ElementBufferObject geoEBO{ geometry.indices };
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
     mainShader.Bind();
     mainShader.SetFloat("radius", settings.planetRadius);
     mainShader.SetInt("enableCurvature", settings.enableCurvature);
 
     float lastFrame{ 0.0f };
-    float cleanGridTime{ 0.0f };
     while (!glfwWindowShouldClose(window->handle)) {
         float currentFrame = (float)glfwGetTime();
 
@@ -161,9 +111,18 @@ int main() {
 
         imGui.StartNewFrame();
         
-        Vanadium::GUI(settings, remakeGrid, n, mainShader, phong, dirLight, dt, cleanGridTime);
+        Vanadium::GUI(settings, remakeGrid, n, mainShader, phong, dirLight, dt);
 
-        if (remakeGrid) grid = Vanadium::CreateGrid(n, settings);
+        if (remakeGrid) {
+            grid = Vanadium::CreateGrid(n, settings);
+            grid = Vanadium::CleanGrid(grid, n);
+
+            geometry = Vanadium::GenerateGeometry(grid, n);
+            geoVBO.UpdateData(Vanadium::VerticesAsFloatVector(geometry.vertices));
+            geoEBO.UpdateData(geometry.indices);
+
+            remakeGrid = false;
+        }
 
         // Basic interaction
         if (glfwGetKey(window->handle, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window->handle, true);
@@ -179,55 +138,40 @@ int main() {
         if (glfwGetKey(window->handle, GLFW_KEY_SPACE) == GLFW_PRESS) cam.position += cam.up * cam.movementSpeed * dt;
         if (glfwGetKey(window->handle, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) cam.position -= cam.up * cam.movementSpeed * dt;
 
-        // Clean Grid
-        float cleanGridStart = (float)glfwGetTime();
-
-        Vanadium::Grid cleanGrid = Vanadium::CleanGrid(grid, n);
-
-        cleanGridTime = (float)glfwGetTime() - cleanGridStart;
-
         // Prep for rendering
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        for (int x = 0; x < n; ++x) {
-            for (int y = 0; y < n; ++y) {
-                for (int z = 0; z < n; ++z) {
-                    if (!cleanGrid[x][y][z]) continue;
+        // Rendering
+        glm::mat4 model{ 1.0f };
+        mainShader.SetMat4("model", model);
 
-                    glm::mat4 model{ 1.0f };
-                    model = glm::translate(model, glm::vec3{ (float)x, (float)y, (float)z });
+        glm::mat4 view = cam.ViewMatrix();
+        glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)window->size.x / (float)window->size.y, 0.01f, 10000.0f);
+        glm::mat4 vp = projection * view;
+        mainShader.SetMat4("vp", vp);
+        
+        mainShader.SetVec3("cameraPosition", cam.position);
+        
+        mainShader.SetVec3("dirLight.direction", dirLight.direction);
+        mainShader.SetVec3("dirLight.ambient", dirLight.ambient);
+        mainShader.SetVec3("dirLight.diffuse", dirLight.diffuse);
+        mainShader.SetVec3("dirLight.specular", dirLight.specular);
+        
+        mainShader.SetFloat("phong.shininess", phong.shininess);
+        mainShader.SetVec3("phong.ambient", phong.ambient);
+        mainShader.SetVec3("phong.diffuse", phong.diffuse);
+        mainShader.SetVec3("phong.specular", phong.specular);
 
-                    glm::mat4 view = cam.ViewMatrix();
-                    glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)window->size.x / (float)window->size.y, 0.01f, 10000.0f);
+        mainShader.SetInt("blockId", 1); // TODO block ID
 
-                    glm::mat4 vp = projection * view;
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, atlas.Get());
 
-                    mainShader.SetMat4("vp", vp);
-                    mainShader.SetMat4("model", model);
+        geoVAO.Bind();
 
-                    mainShader.SetVec3("cameraPosition", cam.position);
-
-                    mainShader.SetVec3("dirLight.direction", dirLight.direction);
-                    mainShader.SetVec3("dirLight.ambient", dirLight.ambient);
-                    mainShader.SetVec3("dirLight.diffuse", dirLight.diffuse);
-                    mainShader.SetVec3("dirLight.specular", dirLight.specular);
-
-                    mainShader.SetFloat("phong.shininess", phong.shininess);
-                    mainShader.SetVec3("phong.ambient", phong.ambient);
-                    mainShader.SetVec3("phong.diffuse", phong.diffuse);
-                    mainShader.SetVec3("phong.specular", phong.specular);
-
-                    mainShader.SetInt("blockId", cleanGrid[x][y][z]);
-
-                    glActiveTexture(GL_TEXTURE0);
-                    glBindTexture(GL_TEXTURE_2D, atlas.Get());
-
-                    // Render
-                    glDrawElements(GL_TRIANGLES, (unsigned int)indices.size(), GL_UNSIGNED_INT, nullptr);
-                }
-            }
-        }
+        // Render
+        glDrawElements(GL_TRIANGLES, (unsigned int)geometry.indices.size(), GL_UNSIGNED_INT, nullptr);
 
         // Finish the GUI frame
         imGui.FinishFrame();
