@@ -1,7 +1,7 @@
 #include "GridGeneration.h"
 
 namespace Vanadium {
-	Grid CreateGrid(unsigned int n, const Settings& settings) {
+	Grid CreateGrid(int n, const Settings& settings) {
         Grid grid{ };
 
         grid.resize(n);

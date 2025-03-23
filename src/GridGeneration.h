@@ -9,5 +9,5 @@ namespace Vanadium {
 
 	using Grid = std::vector<std::vector<std::vector<BlockIndex>>>;
 
-	Grid CreateGrid(unsigned int n, const Settings& settings);
+	Grid CreateGrid(int n, const Settings& settings);
 }

@@ -6,8 +6,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "imgui.h"
-
 #include "Utilities/OpenGl/Context.h"
 #include "Utilities/OpenGl/Shader.h"
 #include "Utilities/OpenGl/Texture.h"
@@ -19,6 +17,7 @@
 
 #include "GridGeneration.h"
 #include "Settings.h"
+#include "GUI.h"
 
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
 void MouseMovementCallback(GLFWwindow* window, double x, double y);
@@ -27,22 +26,6 @@ Camera cam{ };
 bool mouseDown{ false };
 
 std::shared_ptr<Window> window{ };
-
-struct DirectionalLight {
-    glm::vec3 direction;
-
-    glm::vec3 ambient;
-    glm::vec3 diffuse;
-    glm::vec3 specular;
-} dirLight;
-
-struct Phong {
-    glm::vec3 ambient;
-    glm::vec3 diffuse;
-    glm::vec3 specular;
-
-    float shininess;
-} phong;
 
 int main() {
     window = std::make_shared<Window>(glm::ivec2{ 1600, 1000 }, "Vanadium");
@@ -59,6 +42,9 @@ int main() {
     mainShader.Bind();
 
     Vanadium::Settings settings{ };
+
+    Vanadium::Phong phong{ };
+    Vanadium::DirectionalLight dirLight{ };
 
     std::vector<float> vertices{
         -0.5f, -0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   0.0f, 0.0f,
@@ -175,72 +161,7 @@ int main() {
 
         imGui.StartNewFrame();
         
-        // Show GUI
-        { ImGui::Begin("Settings");
-            ImGui::Text("Frame Time: %fms", dt * 1000.0f);
-            ImGui::Text("Time to Clean Grid: %fms", cleanGridTime * 1000.0f);
-
-            if (ImGui::SliderInt("Grid Size", &n, 1, 64)) {
-                remakeGrid = true;
-            }
-
-            ImGui::Separator();
-
-            if (ImGui::Checkbox("Wireframe", &settings.wireframe)) {
-                if (settings.wireframe) {
-                    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-                }
-                else {
-                    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-                }
-            }
-
-            ImGui::Separator();
-
-            ImGui::Text("Directional Light:");
-            ImGui::SliderFloat3("Direction##dirLight", glm::value_ptr(dirLight.direction), -1.0f, 1.0f);
-            ImGui::ColorEdit3("Ambient##dirLight", glm::value_ptr(dirLight.ambient));
-            ImGui::ColorEdit3("Diffuse##dirLight", glm::value_ptr(dirLight.diffuse));
-            ImGui::ColorEdit3("Specular##dirLight", glm::value_ptr(dirLight.specular));
-
-            ImGui::Text("Block material:");
-            ImGui::ColorEdit3("Ambient##phong", glm::value_ptr(phong.ambient));
-            ImGui::ColorEdit3("Diffuse##phong", glm::value_ptr(phong.diffuse));
-            ImGui::ColorEdit3("Specular##phong", glm::value_ptr(phong.specular));
-            ImGui::SliderFloat("Shininess##phong", &phong.shininess, 0.0f, 4096.0f);
-
-            ImGui::Separator();
-
-            ImGui::Text("Noise:");
-            if (ImGui::SliderInt("Octaves##noise", &settings.noise.octaves, 1, 64)) remakeGrid = true;
-            if (ImGui::SliderFloat("Percentage of Voxels Effected##noise", &settings.noise.percentOfBlocksAffected, 0.0f, 1.0f)) remakeGrid = true;
-            if (ImGui::SliderFloat("X Coordinate Multiplier##noise", &settings.noise.xMult, 0.0f, 10.0f)) remakeGrid = true;
-            if (ImGui::SliderFloat("Y Coordinate Multiplier##noise", &settings.noise.yMult, 0.0f, 10.0f)) remakeGrid = true;
-            if (ImGui::SliderFloat("Noise Multiplier##noise", &settings.noise.noiseMult, 0.0f, 10.0f)) remakeGrid = true;
-            if (ImGui::SliderFloat("Noise Offset##noise", &settings.noise.noiseOffset, -100.0f, 100.0f)) remakeGrid = true;
-
-            int s = (int)settings.noise.seed;
-            if (ImGui::SliderInt("Seed##noise", &s, 0, (int)std::numeric_limits<int>::max() / 4)) {
-                settings.noise.seed = s;
-                settings.noise.perlin.reseed(settings.noise.seed);
-
-                remakeGrid = true;
-            }
-
-            ImGui::Separator();
-
-            ImGui::Text("Planet Info:");
-            if (ImGui::SliderFloat("Radius##planet", &settings.planetRadius, 1.0f, 50.0f)) {
-                mainShader.Bind();
-                mainShader.SetFloat("radius", settings.planetRadius);
-            }
-            
-            if (ImGui::Checkbox("Enable Curveature", (bool*)&settings.enableCurvature)) {
-                mainShader.Bind();
-                mainShader.SetBool("enableCurvature", settings.enableCurvature);
-            }
-
-        } ImGui::End();
+        Vanadium::GUI(settings, remakeGrid, n, mainShader, phong, dirLight, dt, cleanGridTime);
 
         if (remakeGrid) {
             grid = Vanadium::CreateGrid(n, settings);
