@@ -14,11 +14,10 @@ namespace Vanadium {
             siv::PerlinNoise perlin{ seed };
 
             int octaves{ 1 };
-            float percentOfBlocksAffected{ 0.25 };
+            float amplitude{ 1.0f };
+            float mean{ 0.0f };
             float xMult{ 1.0f };
-            float yMult{ 1.0f };
-            float noiseMult{ 1.0f };
-            float noiseOffset{ 0.0f };
+            float zMult{ 1.0f };
         } noise;
     };
 }

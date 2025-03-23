@@ -49,11 +49,10 @@ namespace Vanadium {
 
             ImGui::Text("Noise:");
             if (ImGui::SliderInt("Octaves##noise", &settings.noise.octaves, 1, 64)) remakeGrid = true;
-            if (ImGui::SliderFloat("Percentage of Voxels Effected##noise", &settings.noise.percentOfBlocksAffected, 0.0f, 1.0f)) remakeGrid = true;
+            if (ImGui::SliderFloat("Amplitude##noise", &settings.noise.amplitude, 0.001f, 10.0f)) remakeGrid = true;
+            if (ImGui::SliderFloat("Mean##noise", &settings.noise.mean, -10.0f, 10.0f)) remakeGrid = true;
             if (ImGui::SliderFloat("X Coordinate Multiplier##noise", &settings.noise.xMult, 0.0f, 10.0f)) remakeGrid = true;
-            if (ImGui::SliderFloat("Y Coordinate Multiplier##noise", &settings.noise.yMult, 0.0f, 10.0f)) remakeGrid = true;
-            if (ImGui::SliderFloat("Noise Multiplier##noise", &settings.noise.noiseMult, 0.0f, 10.0f)) remakeGrid = true;
-            if (ImGui::SliderFloat("Noise Offset##noise", &settings.noise.noiseOffset, -100.0f, 100.0f)) remakeGrid = true;
+            if (ImGui::SliderFloat("Z Coordinate Multiplier##noise", &settings.noise.zMult, 0.0f, 10.0f)) remakeGrid = true;
 
             int s = (int)settings.noise.seed;
             if (ImGui::SliderInt("Seed##noise", &s, 0, (int)std::numeric_limits<int>::max() / 4)) {

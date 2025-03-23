@@ -84,9 +84,11 @@ int main() {
     int chunkDistance = 1;
     std::vector<Vanadium::ChunkPosition> desiredChunks{ };
 
-    for (int x = -chunkDistance; x < chunkDistance; ++x) {
-        for (int z = -chunkDistance; z < chunkDistance; ++z) {
-            desiredChunks.push_back(Vanadium::ChunkPosition{ x, 0, z });
+    for (int x = -chunkDistance; x < chunkDistance + 1; ++x) {
+        for (int y = -chunkDistance; y < chunkDistance + 1; ++y) {
+            for (int z = -chunkDistance; z < chunkDistance + 1; ++z) {
+                desiredChunks.push_back(Vanadium::ChunkPosition{ x, y, z });
+            }
         }
     }
 
