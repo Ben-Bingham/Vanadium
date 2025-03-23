@@ -21,8 +21,6 @@ uniform Phong phong;
 
 out vec4 outFragColor;
 
-uniform vec4 color;
-
 uniform vec3 cameraPosition;
 
 in vec3 normal;

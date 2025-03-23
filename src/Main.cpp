@@ -61,7 +61,6 @@ int main() {
 
     Shader mainShader{ "assets\\shaders\\main.vert", "assets\\shaders\\main.frag" };
     mainShader.Bind();
-    mainShader.SetVec4("color", glm::vec4{0.0f, 1.0f, 0.0f, 1.0f});
 
     std::vector<float> vertices{
         -0.5f, -0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   0.0f, 0.0f,
@@ -398,10 +397,5 @@ void MouseMovementCallback(GLFWwindow* window, double x, double y) {
 
     cam.pitch = std::clamp(cam.pitch, -89.0f, 89.0f);
 
-    cam.forward.x = cos(glm::radians(cam.yaw)) * cos(glm::radians(cam.pitch));
-    cam.forward.y = sin(glm::radians(cam.pitch));
-    cam.forward.z = sin(glm::radians(cam.yaw)) * cos(glm::radians(cam.pitch));
-    cam.forward = glm::normalize(cam.forward);
-
-    cam.right = glm::normalize(glm::cross(cam.forward, cam.up));
+    cam.CalculateVectors();
 }
