@@ -81,13 +81,14 @@ int main() {
     // Chunk Creation
     int n = 8;
 
-    std::vector<Vanadium::ChunkPosition> desiredChunks{ 
-        Vanadium::ChunkPosition{  0,  0,  0 },
-        Vanadium::ChunkPosition{  1,  0,  0 },
-        Vanadium::ChunkPosition{ -1,  0,  0 },
-        Vanadium::ChunkPosition{  0,  0,  1 },
-        Vanadium::ChunkPosition{  0,  0, -1 }
-    };
+    int chunkDistance = 1;
+    std::vector<Vanadium::ChunkPosition> desiredChunks{ };
+
+    for (int x = -chunkDistance; x < chunkDistance; ++x) {
+        for (int z = -chunkDistance; z < chunkDistance; ++z) {
+            desiredChunks.push_back(Vanadium::ChunkPosition{ x, 0, z });
+        }
+    }
 
     std::vector<Vanadium::Chunk> chunks{ };
     std::vector<Vanadium::GlChunk> glChunks{ };
