@@ -41,7 +41,9 @@ project "Vanadium"
 
 	files {
 		"src/**.h",
-		"src/**.cpp"
+		"src/**.cpp",
+
+		"3rdParty/stb/stb_image.cpp"
 	}
 
 	defines {

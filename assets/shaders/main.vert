@@ -9,10 +9,12 @@ uniform mat4 model;
 
 out vec3 normal;
 out vec3 fragPosition;
+out vec2 uv;
 
 void main() {
 	gl_Position = mvp * vec4(inPos.x, inPos.y, inPos.z, 1.0);
 
 	normal = inNormal;
 	fragPosition = vec3(model * vec4(inPos, 1.0));
+	uv = inUv;
 }

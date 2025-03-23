@@ -128,6 +128,17 @@ int main() {
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
+    Texture::Parameters p {
+        Texture::Format::RGB,
+        Texture::StorageType::UNSIGNED_BYTE,
+        Texture::WrapMode::REPEAT,
+        Texture::FilteringMode::NEAREST
+    };
+
+    Texture atlas{ "assets\\blocks\\atlas.png", p };
+    mainShader.Bind();
+    mainShader.SetInt("textureAtlas", 0);
+
     glFrontFace(GL_CCW);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -347,6 +358,9 @@ int main() {
                     mainShader.SetVec3("phong.ambient", phong.ambient);
                     mainShader.SetVec3("phong.diffuse", phong.diffuse);
                     mainShader.SetVec3("phong.specular", phong.specular);
+
+                    glActiveTexture(GL_TEXTURE0);
+                    glBindTexture(GL_TEXTURE_2D, atlas.Get());
 
                     // Render
                     glDrawElements(GL_TRIANGLES, (unsigned int)indices.size(), GL_UNSIGNED_INT, nullptr);
