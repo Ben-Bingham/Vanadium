@@ -6,8 +6,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <PerlinNoise.hpp>
-
 #include "imgui.h"
 
 #include "Utilities/OpenGl/Context.h"
@@ -19,6 +17,9 @@
 #include "Utilities/OpenGl/Buffer.h"
 #include "Utilities/Camera.h"
 
+#include "GridGeneration.h"
+#include "Settings.h"
+
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
 void MouseMovementCallback(GLFWwindow* window, double x, double y);
 
@@ -26,24 +27,6 @@ Camera cam{ };
 bool mouseDown{ false };
 
 std::shared_ptr<Window> window{ };
-
-struct Settings {
-    bool wireframe{ false };
-
-    float planetRadius{ 10.0f };
-    bool enableCurvature{ true };
-
-    struct Noise {
-        siv::PerlinNoise::seed_type seed{ 123456u };
-
-        int octaves{ 1 };
-        float percentOfBlocksAffected{ 0.25 };
-        float xMult{ 1.0f };
-        float yMult{ 1.0f };
-        float noiseMult{ 1.0f };
-        float noiseOffset{ 0.0f };
-    } noise;
-} settings;
 
 struct DirectionalLight {
     glm::vec3 direction;
@@ -61,8 +44,6 @@ struct Phong {
     float shininess;
 } phong;
 
-using BlockIndex = unsigned char;
-
 int main() {
     window = std::make_shared<Window>(glm::ivec2{ 1600, 1000 }, "Vanadium");
 
@@ -76,6 +57,8 @@ int main() {
 
     Shader mainShader{ "assets\\shaders\\main.vert", "assets\\shaders\\main.frag" };
     mainShader.Bind();
+
+    Vanadium::Settings settings{ };
 
     std::vector<float> vertices{
         -0.5f, -0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   0.0f, 0.0f,
@@ -175,10 +158,8 @@ int main() {
     phong.shininess = 32.0;
 
     int n = 8;
-    std::vector<std::vector<std::vector<BlockIndex>>> grid{ };
+    Vanadium::Grid grid{ };
     bool remakeGrid{ true };
-
-    siv::PerlinNoise perlin{ settings.noise.seed };
 
     mainShader.Bind();
     mainShader.SetFloat("radius", settings.planetRadius);
@@ -241,7 +222,7 @@ int main() {
             int s = (int)settings.noise.seed;
             if (ImGui::SliderInt("Seed##noise", &s, 0, (int)std::numeric_limits<int>::max() / 4)) {
                 settings.noise.seed = s;
-                perlin.reseed(settings.noise.seed);
+                settings.noise.perlin.reseed(settings.noise.seed);
 
                 remakeGrid = true;
             }
@@ -262,49 +243,7 @@ int main() {
         } ImGui::End();
 
         if (remakeGrid) {
-            grid.clear();
-
-            grid.resize(n);
-            for (auto& r : grid) {
-                r.resize(n);
-                for (auto& c : r) {
-                    c.resize(n);
-                }
-            }
-
-            for (int x = 0; x < n; ++x) {
-                for (int z = 0; z < n; ++z) {
-                    double noise = perlin.octave2D_01((double)x * (double)settings.noise.xMult, (double)z * (double)settings.noise.yMult, settings.noise.octaves);
-                    noise *= settings.noise.percentOfBlocksAffected;
-                    noise += 1.0;
-                    noise -= settings.noise.percentOfBlocksAffected;
-
-                    noise *= settings.noise.noiseMult;
-                    noise += settings.noise.noiseOffset;
-
-                    noise *= (double)n;
-
-                    for (int y = 0; y < n; ++y) {
-                        if (y > noise) {
-                            grid[x][y][z] = 0;
-
-                            break;
-                        }
-
-                        if (y == noise) {
-                            grid[x][y][z] = 1;
-                            continue;
-                        }
-
-                        if (y >= noise - 3) {
-                            grid[x][y][z] = 2;
-                            continue;
-                        }
-
-                        grid[x][y][z] = 3;
-                    }
-                }
-            }
+            grid = Vanadium::CreateGrid(n, settings);
         }
 
         // Basic interaction
@@ -348,7 +287,7 @@ int main() {
                 for (int z = 0; z < n; ++z) {
                     if (!cleanGrid[x][y][z]) continue;
 
-                    BlockIndex px = 0, py = 0, pz = 0, nx = 0, ny = 0, nz = 0;
+                    Vanadium::BlockIndex px = 0, py = 0, pz = 0, nx = 0, ny = 0, nz = 0;
 
                     if (x + 1 < n) px = grid[x + 1][y][z];
                     if (y + 1 < n) py = grid[x][y + 1][z];
