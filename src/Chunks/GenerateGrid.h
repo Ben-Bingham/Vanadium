@@ -4,10 +4,8 @@
 
 #include "Settings.h"
 
+#include "Chunk.h"
+
 namespace Vanadium {
-	using BlockIndex = unsigned char;
-
-	using Grid = std::vector<std::vector<std::vector<BlockIndex>>>;
-
-	Grid CreateGrid(int n, const Settings& settings);
+	Grid CreateGrid(const ChunkPosition& position, int n, const Settings& settings);
 }

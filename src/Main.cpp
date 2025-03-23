@@ -19,6 +19,7 @@
 #include "Chunks/GenerateGrid.h"
 #include "Chunks/CleanGrid.h"
 #include "Chunks/GenerateGeometry.h"
+#include "Chunks/GenerateChunk.h"
 #include "Settings.h"
 #include "GUI.h"
 
@@ -60,8 +61,6 @@ int main() {
     Texture atlas{ "assets\\blocks\\atlas.png", p, false };
     mainShader.Bind();
     mainShader.SetInt("textureAtlas", 0);
-    mainShader.SetInt("atlasWidth", 2);
-    mainShader.SetInt("atlasHeight", 2);
 
     // Basic OpenGL settings
     glFrontFace(GL_CCW);
@@ -121,10 +120,8 @@ int main() {
         Vanadium::GUI(settings, remakeGrid, n, mainShader, phong, dirLight, dt);
 
         if (remakeGrid) {
-            chunks[0].grid = Vanadium::CreateGrid(n, settings);
-            chunks[0].grid = Vanadium::CleanGrid(chunks[0].grid, n);
+            chunks[0] = Vanadium::GenerateChunk(Vanadium::ChunkPosition{ 1, 0, 0 }, settings, n, 2, 2);
 
-            chunks[0].geometry = Vanadium::GenerateGeometry(chunks[0].grid, n, 2, 2);
             glChunks[0].vao->Bind();
             glChunks[0].vbo->UpdateData(Vanadium::VerticesAsFloatVector(chunks[0].geometry.vertices));
             glChunks[0].ebo->UpdateData(chunks[0].geometry.indices);

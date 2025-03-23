@@ -55,7 +55,7 @@ namespace Vanadium {
         20, 23, 22,
     };
 
-	Geometry GenerateGeometry(const Grid& grid, int n, int atlasWidth, int atlasHeight) {
+	Geometry GenerateGeometry(const ChunkPosition& position, const Grid& grid, int n, int atlasWidth, int atlasHeight) {
         Geometry geo{ };
 
         int highestIndex = 0;
@@ -66,7 +66,7 @@ namespace Vanadium {
 					if (grid[x][y][z] == 0) continue;
 
                     glm::mat4 translation{ 1.0f };
-                    translation = glm::translate(translation, glm::vec3{ (float)x, (float)y, (float)z });
+                    translation = glm::translate(translation, glm::vec3{ (float)(x + (position.x * n)), (float)(y + (position.y * n)), (float)(z + (position.z * n))});
 
                     std::vector<Vertex> vertices = cubeVertices;
                     for (auto& v : vertices) {

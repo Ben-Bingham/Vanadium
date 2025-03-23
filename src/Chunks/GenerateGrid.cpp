@@ -1,7 +1,7 @@
 #include "GenerateGrid.h"
 
 namespace Vanadium {
-	Grid CreateGrid(int n, const Settings& settings) {
+	Grid CreateGrid(const ChunkPosition& position, int n, const Settings& settings) {
         Grid grid{ };
 
         grid.resize(n);
@@ -14,7 +14,7 @@ namespace Vanadium {
 
         for (int x = 0; x < n; ++x) {
             for (int z = 0; z < n; ++z) {
-                double noise = settings.noise.perlin.octave2D_01((double)x * (double)settings.noise.xMult, (double)z * (double)settings.noise.yMult, settings.noise.octaves);
+                double noise = settings.noise.perlin.octave2D_01((double)(x + (position.x * n)) * (double)settings.noise.xMult, (double)(z + (position.z * n)) * (double)settings.noise.yMult, settings.noise.octaves);
                 noise *= settings.noise.percentOfBlocksAffected;
                 noise += 1.0;
                 noise -= settings.noise.percentOfBlocksAffected;

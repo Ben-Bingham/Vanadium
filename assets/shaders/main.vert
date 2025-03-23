@@ -11,10 +11,6 @@ out vec3 normal;
 out vec3 fragPosition;
 out vec2 uv;
 
-uniform int blockId;
-uniform int atlasWidth;
-uniform int atlasHeight;
-
 uniform vec3 cameraPosition;
 
 uniform float radius;

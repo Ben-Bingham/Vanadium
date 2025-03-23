@@ -1,13 +1,18 @@
 #pragma once
 
-#include "GenerateGeometry.h"
-#include "GenerateGrid.h"
+#include "Geometry.h"
+#include "Grid.h"
+
+#include "Utilities/OpenGl/VertexAttributeObject.h"
+#include "Utilities/OpenGl/Buffer.h"
 
 namespace Vanadium {
+	using ChunkPosition = glm::ivec3;
+
 	struct Chunk {
 		Geometry geometry{ };
 
-		glm::ivec3 position{ };
+		ChunkPosition position{ };
 
 		Grid grid{ };
 	};
