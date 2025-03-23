@@ -93,8 +93,8 @@ int main() {
     glChunks.resize(1);
     glChunks[0].vao = std::make_unique<VertexAttributeObject>();
     glChunks[0].vao->Bind();
-    glChunks[0].vbo = std::make_unique<VertexBufferObject>(Vanadium::VerticesAsFloatVector(chunk.geometry.vertices));
-    glChunks[0].ebo = std::make_unique<ElementBufferObject>(chunk.geometry.indices);
+    glChunks[0].vbo = std::make_unique<VertexBufferObject>();
+    glChunks[0].ebo = std::make_unique<ElementBufferObject>();
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
     glEnableVertexAttribArray(0);
@@ -205,7 +205,6 @@ void MouseMovementCallback(GLFWwindow* window, double x, double y) {
 
         return;
     }
-
 
     if (cam.lastMousePos.x == std::numeric_limits<float>::max()) {
         cam.lastMousePos = pos;

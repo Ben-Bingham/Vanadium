@@ -9,7 +9,7 @@
 template<typename T, int BUFFER_TYPE>
 class GlBuffer {
 public:
-    GlBuffer(const std::vector<T>& data, unsigned int usage = GL_STATIC_DRAW) {
+    GlBuffer(const std::vector<T>& data = std::vector<T>{ }, unsigned int usage = GL_STATIC_DRAW) {
         glGenBuffers(1, &m_Handle);
 
         Bind();
