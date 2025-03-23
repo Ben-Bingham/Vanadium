@@ -96,15 +96,6 @@ int main() {
     glChunks[0].vbo = std::make_unique<VertexBufferObject>(Vanadium::VerticesAsFloatVector(chunk.geometry.vertices));
     glChunks[0].ebo = std::make_unique<ElementBufferObject>(chunk.geometry.indices);
 
-
-    //Vanadium::Grid grid{ };
-
-
-    //VertexAttributeObject geoVAO{ };
-
-    //VertexBufferObject geoVBO{ Vanadium::VerticesAsFloatVector(geometry.vertices) };
-    //ElementBufferObject geoEBO{ geometry.indices };
-
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
     glEnableVertexAttribArray(0);
 
