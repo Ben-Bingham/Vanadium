@@ -15,6 +15,7 @@
 #include "Utilities/OpenGl/Buffer.h"
 #include "Utilities/Camera.h"
 
+#include "Chunks/Chunk.h"
 #include "Chunks/GridGeneration.h"
 #include "Chunks/CleanGrid.h"
 #include "Chunks/GenerateGeometry.h"
@@ -44,6 +45,9 @@ int main() {
     mainShader.Bind();
 
     Vanadium::Settings settings{ };
+
+    std::vector<Vanadium::Chunk> chunks{ };
+    std::vector<Vanadium::GlChunk> glChunks{ };
 
     // Texture Atlas
     Texture::Parameters p {
@@ -78,16 +82,28 @@ int main() {
     phong.specular = phong.ambient * 0.3f;
     phong.shininess = 32.0;
 
+    Vanadium::Chunk chunk{ };
+
     int n = 8;
-    Vanadium::Grid grid{ };
+    chunk.position = glm::ivec3{ 0, 0, 0 };
     bool remakeGrid{ true };
 
-    Vanadium::Geometry geometry{ };
+    chunks.push_back(chunk);
 
-    VertexAttributeObject geoVAO{ };
+    glChunks.resize(1);
+    glChunks[0].vao = std::make_unique<VertexAttributeObject>();
+    glChunks[0].vao->Bind();
+    glChunks[0].vbo = std::make_unique<VertexBufferObject>(Vanadium::VerticesAsFloatVector(chunk.geometry.vertices));
+    glChunks[0].ebo = std::make_unique<ElementBufferObject>(chunk.geometry.indices);
 
-    VertexBufferObject geoVBO{ Vanadium::VerticesAsFloatVector(geometry.vertices) };
-    ElementBufferObject geoEBO{ geometry.indices };
+
+    //Vanadium::Grid grid{ };
+
+
+    //VertexAttributeObject geoVAO{ };
+
+    //VertexBufferObject geoVBO{ Vanadium::VerticesAsFloatVector(geometry.vertices) };
+    //ElementBufferObject geoEBO{ geometry.indices };
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
     glEnableVertexAttribArray(0);
@@ -114,12 +130,13 @@ int main() {
         Vanadium::GUI(settings, remakeGrid, n, mainShader, phong, dirLight, dt);
 
         if (remakeGrid) {
-            grid = Vanadium::CreateGrid(n, settings);
-            grid = Vanadium::CleanGrid(grid, n);
+            chunks[0].grid = Vanadium::CreateGrid(n, settings);
+            chunks[0].grid = Vanadium::CleanGrid(chunks[0].grid, n);
 
-            geometry = Vanadium::GenerateGeometry(grid, n, 2, 2);
-            geoVBO.UpdateData(Vanadium::VerticesAsFloatVector(geometry.vertices));
-            geoEBO.UpdateData(geometry.indices);
+            chunks[0].geometry = Vanadium::GenerateGeometry(chunks[0].grid, n, 2, 2);
+            glChunks[0].vao->Bind();
+            glChunks[0].vbo->UpdateData(Vanadium::VerticesAsFloatVector(chunks[0].geometry.vertices));
+            glChunks[0].ebo->UpdateData(chunks[0].geometry.indices);
 
             remakeGrid = false;
         }
@@ -163,15 +180,13 @@ int main() {
         mainShader.SetVec3("phong.diffuse", phong.diffuse);
         mainShader.SetVec3("phong.specular", phong.specular);
 
-        mainShader.SetInt("blockId", 1); // TODO block ID
-
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, atlas.Get());
 
-        geoVAO.Bind();
+        glChunks[0].vao->Bind();
 
         // Render
-        glDrawElements(GL_TRIANGLES, (unsigned int)geometry.indices.size(), GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, (unsigned int)chunks[0].geometry.indices.size(), GL_UNSIGNED_INT, nullptr);
 
         // Finish the GUI frame
         imGui.FinishFrame();
