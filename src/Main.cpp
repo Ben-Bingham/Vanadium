@@ -183,14 +183,14 @@ int main() {
 
             ImGui::Text("Directional Light:");
             ImGui::SliderFloat3("Direction##dirLight", glm::value_ptr(dirLight.direction), -1.0f, 1.0f);
-            ImGui::SliderFloat3("Ambient##dirLight", glm::value_ptr(dirLight.ambient), 0.0f, 1.0f);
-            ImGui::SliderFloat3("Diffuse##dirLight", glm::value_ptr(dirLight.diffuse), 0.0f, 1.0f);
-            ImGui::SliderFloat3("Specular##dirLight", glm::value_ptr(dirLight.specular), 0.0f, 1.0f);
+            ImGui::ColorEdit3("Ambient##dirLight", glm::value_ptr(dirLight.ambient));
+            ImGui::ColorEdit3("Diffuse##dirLight", glm::value_ptr(dirLight.diffuse));
+            ImGui::ColorEdit3("Specular##dirLight", glm::value_ptr(dirLight.specular));
 
             ImGui::Text("Block material:");
-            ImGui::SliderFloat3("Ambient##phong", glm::value_ptr(phong.ambient), 0.0f, 1.0f);
-            ImGui::SliderFloat3("Diffuse##phong", glm::value_ptr(phong.diffuse), 0.0f, 1.0f);
-            ImGui::SliderFloat3("Specular##phong", glm::value_ptr(phong.specular), 0.0f, 1.0f);
+            ImGui::ColorEdit3("Ambient##phong", glm::value_ptr(phong.ambient));
+            ImGui::ColorEdit3("Diffuse##phong", glm::value_ptr(phong.diffuse));
+            ImGui::ColorEdit3("Specular##phong", glm::value_ptr(phong.specular));
             ImGui::SliderFloat("Shininess##phong", &phong.shininess, 0.0f, 4096.0f);
 
             ImGui::Separator();
