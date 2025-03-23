@@ -33,8 +33,5 @@ void main() {
 	normal = inNormal;
 	fragPosition = vec3(model * vec4(inPos, 1.0));
 
-	uv = inUv * 0.5;
-
-    uv.x += (0.5 * int(mod(blockId - 1, 2)));
-    uv.y += (0.5 * int(floor((blockId - 1) / 2)));
+	uv = inUv;
 }

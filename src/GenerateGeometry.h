@@ -46,7 +46,7 @@ namespace Vanadium {
 		std::vector<Index> indices;
 	};
 
-	Geometry GenerateGeometry(const Grid& grid, int n);
+	Geometry GenerateGeometry(const Grid& grid, int n, int atlasWidth, int atlasHeight);
 
 	std::vector<float> VerticesAsFloatVector(const std::vector<Vertex>& vertices);
 }

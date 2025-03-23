@@ -22,7 +22,7 @@ Texture::Texture(glm::ivec2 size, Parameters parameters, std::vector<unsigned ch
     }
 }
 
-Texture::Texture(const std::string& path, Parameters parameters) {
+Texture::Texture(const std::string& path, Parameters parameters, bool flip) {
     glGenTextures(1, &m_TextureHandle);
     glBindTexture(GL_TEXTURE_2D, m_TextureHandle);
 
@@ -33,7 +33,7 @@ Texture::Texture(const std::string& path, Parameters parameters) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, (int)parameters.magFilter);
 
     int width, height, nrChannels;
-    stbi_set_flip_vertically_on_load(true);
+    stbi_set_flip_vertically_on_load(flip);
     unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrChannels, 3);
     if (data) {
         glTexImage2D(GL_TEXTURE_2D, 0, (int)parameters.imageFormat, width, height, 0, GL_RGB, (int)parameters.internalStorageType, data);

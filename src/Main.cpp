@@ -53,7 +53,7 @@ int main() {
         Texture::FilteringMode::NEAREST
     };
 
-    Texture atlas{ "assets\\blocks\\atlas.png", p };
+    Texture atlas{ "assets\\blocks\\atlas.png", p, false };
     mainShader.Bind();
     mainShader.SetInt("textureAtlas", 0);
     mainShader.SetInt("atlasWidth", 2);
@@ -117,7 +117,7 @@ int main() {
             grid = Vanadium::CreateGrid(n, settings);
             grid = Vanadium::CleanGrid(grid, n);
 
-            geometry = Vanadium::GenerateGeometry(grid, n);
+            geometry = Vanadium::GenerateGeometry(grid, n, 2, 2);
             geoVBO.UpdateData(Vanadium::VerticesAsFloatVector(geometry.vertices));
             geoEBO.UpdateData(geometry.indices);
 

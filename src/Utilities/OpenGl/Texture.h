@@ -54,7 +54,7 @@ public:
     };
 
     Texture(glm::ivec2 size, Parameters parameters = Parameters{ }, std::vector<unsigned char> data = std::vector<unsigned char>{ });
-    Texture(const std::string& path, Parameters parameters = Parameters{ });
+    Texture(const std::string& path, Parameters parameters = Parameters{ }, bool flip = true);
     Texture(const Texture& other) = delete;
     Texture(Texture&& other) noexcept = default;
     Texture& operator=(const Texture& other) = delete;

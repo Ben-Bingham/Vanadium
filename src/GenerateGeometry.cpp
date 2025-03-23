@@ -55,7 +55,7 @@ namespace Vanadium {
         20, 23, 22,
     };
 
-	Geometry GenerateGeometry(const Grid& grid, int n) {
+	Geometry GenerateGeometry(const Grid& grid, int n, int atlasWidth, int atlasHeight) {
         Geometry geo{ };
 
         int highestIndex = 0;
@@ -75,6 +75,22 @@ namespace Vanadium {
                         v4 = translation * v4;
 
                         v.position = glm::vec3{ v4.x, v4.y, v4.z };
+                    }
+
+                    for (auto& v : vertices) {
+                        glm::vec2 uv = v.uv;
+                        BlockIndex id = grid[x][y][z];
+                        int i = (int)id - 1;
+
+                        int x = i % 2;
+                        int y = (int)std::floor((float)i / 2.0f);
+
+                        uv *= 0.5;
+
+                        uv.x += 0.5 * x;
+                        uv.y += 0.5 * y;
+
+                        v.uv = uv;
                     }
 
                     geo.vertices.insert(geo.vertices.end(), vertices.begin(), vertices.end());
