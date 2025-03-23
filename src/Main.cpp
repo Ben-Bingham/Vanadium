@@ -163,41 +163,21 @@ int main() {
         
         Vanadium::GUI(settings, remakeGrid, n, mainShader, phong, dirLight, dt, cleanGridTime);
 
-        if (remakeGrid) {
-            grid = Vanadium::CreateGrid(n, settings);
-        }
+        if (remakeGrid) grid = Vanadium::CreateGrid(n, settings);
 
         // Basic interaction
-        if (glfwGetKey(window->handle, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-            glfwSetWindowShouldClose(window->handle, true);
-        }
+        if (glfwGetKey(window->handle, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window->handle, true);
 
-        if (glfwGetMouseButton(window->handle, 0) == GLFW_PRESS) {
-            mouseDown = true;
-        }
-        else {
-            mouseDown = false;
-        }
+        if (glfwGetMouseButton(window->handle, 0) == GLFW_PRESS) mouseDown = true;
+        else mouseDown = false;
 
         // Camera Movement
-        if (glfwGetKey(window->handle, GLFW_KEY_W) == GLFW_PRESS) {
-            cam.position += cam.forward * cam.movementSpeed * dt;
-        }
-        if (glfwGetKey(window->handle, GLFW_KEY_S) == GLFW_PRESS) {
-            cam.position -= cam.forward * cam.movementSpeed * dt;
-        }
-        if (glfwGetKey(window->handle, GLFW_KEY_A) == GLFW_PRESS) {
-            cam.position -= cam.right * cam.movementSpeed * dt;
-        }
-        if (glfwGetKey(window->handle, GLFW_KEY_D) == GLFW_PRESS) {
-            cam.position += cam.right * cam.movementSpeed * dt;
-        }
-        if (glfwGetKey(window->handle, GLFW_KEY_SPACE) == GLFW_PRESS) {
-            cam.position += cam.up * cam.movementSpeed * dt;
-        }
-        if (glfwGetKey(window->handle, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-            cam.position -= cam.up * cam.movementSpeed * dt;
-        }
+        if (glfwGetKey(window->handle, GLFW_KEY_W) == GLFW_PRESS) cam.position += cam.forward * cam.movementSpeed * dt;
+        if (glfwGetKey(window->handle, GLFW_KEY_S) == GLFW_PRESS) cam.position -= cam.forward * cam.movementSpeed * dt;
+        if (glfwGetKey(window->handle, GLFW_KEY_A) == GLFW_PRESS) cam.position -= cam.right * cam.movementSpeed * dt;
+        if (glfwGetKey(window->handle, GLFW_KEY_D) == GLFW_PRESS) cam.position += cam.right * cam.movementSpeed * dt;
+        if (glfwGetKey(window->handle, GLFW_KEY_SPACE) == GLFW_PRESS) cam.position += cam.up * cam.movementSpeed * dt;
+        if (glfwGetKey(window->handle, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) cam.position -= cam.up * cam.movementSpeed * dt;
 
         // Clean Grid
         float cleanGridStart = (float)glfwGetTime();
@@ -294,3 +274,46 @@ void MouseMovementCallback(GLFWwindow* window, double x, double y) {
 
     cam.CalculateVectors();
 }
+
+/*
+
+// Main Thread:
+glm::vec3 lastCamPos = cam.position;
+
+Jobs jobs{ };
+
+int chunkDistance = 6;
+int halfchunkDistance = floor(chunkDistance / 2)
+for (int x = -halfchunkDistance; x < halfchunkDistance; ++x) {
+    for (int y = -halfchunkDistance; y < halfchunkDistance; ++x) {
+        jobs.AddJob(glm::ivec2(x, y));
+    }
+}
+
+while (true) {
+    auto freshGeoemtry = jobs.GetFinishedGeometry();
+    availableGeometry.insert(freshGeoemtry.begin(), freshGeoemtry.end())
+
+    for (geo : availableGeometry) {
+        if (geo.visible) {
+            Render(geo);   
+        }
+    }
+
+    if (lastCamPos != cam.position) {
+        if (crossed chunk boundry) {
+            // Determine if we crossed an X boundry, or a Z boundry, or at a diagonal, then do a single for loop
+            // to figure out which chunks need to be added.
+            // Also do this to figure out which chunks to remove.
+            for (chunk : newChunks) {
+                jobs.AddJob(chunk)
+            }
+
+            for (chunk : chunksToRemove) {
+                jobs.DelteJob(chunk);
+            }
+        }
+    }
+}
+
+*/
