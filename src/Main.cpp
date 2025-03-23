@@ -117,7 +117,7 @@ int main() {
         6,  7,  4,
 
         8,  9, 10,
-        10, 11,  8,
+        10, 11, 8,
 
         14, 13, 12,
         12, 15, 14,
@@ -143,6 +143,7 @@ int main() {
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
+    // Texture Atlas
     Texture::Parameters p {
         Texture::Format::RGB,
         Texture::StorageType::UNSIGNED_BYTE,
@@ -156,10 +157,13 @@ int main() {
     mainShader.SetInt("atlasWidth", 2);
     mainShader.SetInt("atlasHeight", 2);
 
+    // Basic OpenGL settings
     glFrontFace(GL_CCW);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+    // Material Settings
     dirLight.direction = glm::vec3(-0.2f, 1.0f, 0.2f);
     dirLight.ambient = glm::vec3(0.7f);
     dirLight.diffuse = glm::vec3(0.4f);
@@ -201,7 +205,14 @@ int main() {
 
             ImGui::Separator();
 
-            ImGui::Checkbox("Wireframe", &settings.wireframe);
+            if (ImGui::Checkbox("Wireframe", &settings.wireframe)) {
+                if (settings.wireframe) {
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+                }
+                else {
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+                }
+            }
 
             ImGui::Separator();
 
@@ -294,14 +305,6 @@ int main() {
                     }
                 }
             }
-        }
-
-        // Settings
-        if (settings.wireframe) {
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        }
-        else {
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
 
         // Basic interaction
