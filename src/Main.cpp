@@ -18,6 +18,7 @@
 #include "GridGeneration.h"
 #include "Settings.h"
 #include "GUI.h"
+#include "CleanGrid.h"
 
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
 void MouseMovementCallback(GLFWwindow* window, double x, double y);
@@ -42,9 +43,6 @@ int main() {
     mainShader.Bind();
 
     Vanadium::Settings settings{ };
-
-    Vanadium::Phong phong{ };
-    Vanadium::DirectionalLight dirLight{ };
 
     std::vector<float> vertices{
         -0.5f, -0.5f, -0.5f,    0.0f,  0.0f, -1.0f,   0.0f, 0.0f,
@@ -133,11 +131,13 @@ int main() {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     // Material Settings
+    Vanadium::DirectionalLight dirLight{ };
     dirLight.direction = glm::vec3(-0.2f, 1.0f, 0.2f);
     dirLight.ambient = glm::vec3(0.7f);
     dirLight.diffuse = glm::vec3(0.4f);
     dirLight.specular = glm::vec3(0.2f);
 
+    Vanadium::Phong phong{ };
     phong.ambient = glm::vec3(0.5f, 0.4f, 0.7f);
     phong.diffuse = phong.ambient * 0.8f;
     phong.specular = phong.ambient * 0.3f;
@@ -201,29 +201,8 @@ int main() {
 
         // Clean Grid
         float cleanGridStart = (float)glfwGetTime();
-        auto cleanGrid = grid;
 
-        for (int x = 0; x < n; ++x) {
-            for (int y = 0; y < n; ++y) {
-                for (int z = 0; z < n; ++z) {
-                    if (!cleanGrid[x][y][z]) continue;
-
-                    Vanadium::BlockIndex px = 0, py = 0, pz = 0, nx = 0, ny = 0, nz = 0;
-
-                    if (x + 1 < n) px = grid[x + 1][y][z];
-                    if (y + 1 < n) py = grid[x][y + 1][z];
-                    if (z + 1 < n) pz = grid[x][y][z + 1];
-
-                    if (x - 1 >= 0) nx = grid[x - 1][y][z];
-                    if (y - 1 >= 0) ny = grid[x][y - 1][z];
-                    if (z - 1 >= 0) nz = grid[x][y][z - 1];
-
-                    if (px && py && pz && nx && ny && nz) {
-                        cleanGrid[x][y][z] = 0;
-                    }
-                }
-            }
-        }
+        Vanadium::Grid cleanGrid = Vanadium::CleanGrid(grid, n);
 
         cleanGridTime = (float)glfwGetTime() - cleanGridStart;
 
