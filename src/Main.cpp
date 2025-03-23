@@ -15,11 +15,11 @@
 #include "Utilities/OpenGl/Buffer.h"
 #include "Utilities/Camera.h"
 
-#include "GridGeneration.h"
+#include "Chunks/GridGeneration.h"
+#include "Chunks/CleanGrid.h"
+#include "Chunks/GenerateGeometry.h"
 #include "Settings.h"
 #include "GUI.h"
-#include "CleanGrid.h"
-#include "GenerateGeometry.h"
 
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
 void MouseMovementCallback(GLFWwindow* window, double x, double y);

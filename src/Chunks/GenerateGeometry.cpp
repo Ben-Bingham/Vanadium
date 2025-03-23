@@ -85,10 +85,10 @@ namespace Vanadium {
                         int x = i % 2;
                         int y = (int)std::floor((float)i / 2.0f);
 
-                        uv *= 0.5;
+                        uv *= 0.5f;
 
-                        uv.x += 0.5 * x;
-                        uv.y += 0.5 * y;
+                        uv.x += 0.5f * x;
+                        uv.y += 0.5f * y;
 
                         v.uv = uv;
                     }
