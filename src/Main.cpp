@@ -161,7 +161,7 @@ int main() {
     std::vector<std::vector<std::vector<BlockIndex>>> grid{ };
     bool remakeGrid{ true };
 
-    siv::PerlinNoise::seed_type seed = 123456u;
+    siv::PerlinNoise::seed_type seed{ 123456u };
     siv::PerlinNoise perlin{ seed };
     int octaves{ 1 };
     float percentOfBlocksAffected{ 0.25 };
@@ -169,6 +169,13 @@ int main() {
     float yMult{ 1.0f };
     float noiseMult{ 1.0f };
     float noiseOffset{ 0.0f };
+
+    float planetRadius{ 10.0f };
+    bool enableCurvature{ true };
+
+    mainShader.Bind();
+    mainShader.SetFloat("radius", planetRadius);
+    mainShader.SetInt("enableCurvature", enableCurvature);
 
     float lastFrame{ 0.0f };
     float cleanGridTime{ 0.0f };
@@ -223,6 +230,19 @@ int main() {
                 perlin.reseed(seed);
 
                 remakeGrid = true;
+            }
+
+            ImGui::Separator();
+
+            ImGui::Text("Planet Info:");
+            if (ImGui::SliderFloat("Radius##planet", &planetRadius, 1.0f, 50.0f)) {
+                mainShader.Bind();
+                mainShader.SetFloat("radius", planetRadius);
+            }
+            
+            if (ImGui::Checkbox("Enable Curveature", (bool*)&enableCurvature)) {
+                mainShader.Bind();
+                mainShader.SetBool("enableCurvature", enableCurvature);
             }
 
         } ImGui::End();
@@ -354,12 +374,13 @@ int main() {
                     model = glm::translate(model, glm::vec3{ (float)x, (float)y, (float)z });
 
                     glm::mat4 view = cam.ViewMatrix();
-                    glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)window->size.x / (float)window->size.y, 0.01f, 100.0f);
+                    glm::mat4 projection = glm::perspective(glm::radians(60.0f), (float)window->size.x / (float)window->size.y, 0.01f, 10000.0f);
 
-                    glm::mat4 mvp = projection * view * model;
+                    glm::mat4 vp = projection * view;
 
-                    mainShader.SetMat4("mvp", mvp);
+                    mainShader.SetMat4("vp", vp);
                     mainShader.SetMat4("model", model);
+
                     mainShader.SetVec3("cameraPosition", cam.position);
 
                     mainShader.SetVec3("dirLight.direction", dirLight.direction);
