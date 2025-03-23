@@ -4,6 +4,7 @@
 #include <array>
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <PerlinNoise.hpp>
 
@@ -17,8 +18,6 @@
 #include "Utilities/OpenGl/VertexAttributeObject.h"
 #include "Utilities/OpenGl/Buffer.h"
 #include "Utilities/Camera.h"
-#include <glm/gtc/type_ptr.hpp>
-
 
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
 void MouseMovementCallback(GLFWwindow* window, double x, double y);
@@ -30,6 +29,20 @@ std::shared_ptr<Window> window{ };
 
 struct Settings {
     bool wireframe{ false };
+
+    float planetRadius{ 10.0f };
+    bool enableCurvature{ true };
+
+    struct Noise {
+        siv::PerlinNoise::seed_type seed{ 123456u };
+
+        int octaves{ 1 };
+        float percentOfBlocksAffected{ 0.25 };
+        float xMult{ 1.0f };
+        float yMult{ 1.0f };
+        float noiseMult{ 1.0f };
+        float noiseOffset{ 0.0f };
+    } noise;
 } settings;
 
 struct DirectionalLight {
@@ -47,6 +60,8 @@ struct Phong {
 
     float shininess;
 } phong;
+
+using BlockIndex = unsigned char;
 
 int main() {
     window = std::make_shared<Window>(glm::ivec2{ 1600, 1000 }, "Vanadium");
@@ -155,27 +170,15 @@ int main() {
     phong.specular = phong.ambient * 0.3f;
     phong.shininess = 32.0;
 
-    using BlockIndex = unsigned char;
-
     int n = 8;
     std::vector<std::vector<std::vector<BlockIndex>>> grid{ };
     bool remakeGrid{ true };
 
-    siv::PerlinNoise::seed_type seed{ 123456u };
-    siv::PerlinNoise perlin{ seed };
-    int octaves{ 1 };
-    float percentOfBlocksAffected{ 0.25 };
-    float xMult{ 1.0f };
-    float yMult{ 1.0f };
-    float noiseMult{ 1.0f };
-    float noiseOffset{ 0.0f };
-
-    float planetRadius{ 10.0f };
-    bool enableCurvature{ true };
+    siv::PerlinNoise perlin{ settings.noise.seed };
 
     mainShader.Bind();
-    mainShader.SetFloat("radius", planetRadius);
-    mainShader.SetInt("enableCurvature", enableCurvature);
+    mainShader.SetFloat("radius", settings.planetRadius);
+    mainShader.SetInt("enableCurvature", settings.enableCurvature);
 
     float lastFrame{ 0.0f };
     float cleanGridTime{ 0.0f };
@@ -217,17 +220,17 @@ int main() {
             ImGui::Separator();
 
             ImGui::Text("Noise:");
-            if (ImGui::SliderInt("Octaves##noise", &octaves, 1, 64)) remakeGrid = true;
-            if (ImGui::SliderFloat("Percentage of Voxels Effected##noise", &percentOfBlocksAffected, 0.0f, 1.0f)) remakeGrid = true;
-            if (ImGui::SliderFloat("X Coordinate Multiplier##noise", &xMult, 0.0f, 10.0f)) remakeGrid = true;
-            if (ImGui::SliderFloat("Y Coordinate Multiplier##noise", &yMult, 0.0f, 10.0f)) remakeGrid = true;
-            if (ImGui::SliderFloat("Noise Multiplier##noise", &noiseMult, 0.0f, 10.0f)) remakeGrid = true;
-            if (ImGui::SliderFloat("Noise Offset##noise", &noiseOffset, -100.0f, 100.0f)) remakeGrid = true;
+            if (ImGui::SliderInt("Octaves##noise", &settings.noise.octaves, 1, 64)) remakeGrid = true;
+            if (ImGui::SliderFloat("Percentage of Voxels Effected##noise", &settings.noise.percentOfBlocksAffected, 0.0f, 1.0f)) remakeGrid = true;
+            if (ImGui::SliderFloat("X Coordinate Multiplier##noise", &settings.noise.xMult, 0.0f, 10.0f)) remakeGrid = true;
+            if (ImGui::SliderFloat("Y Coordinate Multiplier##noise", &settings.noise.yMult, 0.0f, 10.0f)) remakeGrid = true;
+            if (ImGui::SliderFloat("Noise Multiplier##noise", &settings.noise.noiseMult, 0.0f, 10.0f)) remakeGrid = true;
+            if (ImGui::SliderFloat("Noise Offset##noise", &settings.noise.noiseOffset, -100.0f, 100.0f)) remakeGrid = true;
 
-            int s = (int)seed;
+            int s = (int)settings.noise.seed;
             if (ImGui::SliderInt("Seed##noise", &s, 0, (int)std::numeric_limits<int>::max() / 4)) {
-                seed = s;
-                perlin.reseed(seed);
+                settings.noise.seed = s;
+                perlin.reseed(settings.noise.seed);
 
                 remakeGrid = true;
             }
@@ -235,14 +238,14 @@ int main() {
             ImGui::Separator();
 
             ImGui::Text("Planet Info:");
-            if (ImGui::SliderFloat("Radius##planet", &planetRadius, 1.0f, 50.0f)) {
+            if (ImGui::SliderFloat("Radius##planet", &settings.planetRadius, 1.0f, 50.0f)) {
                 mainShader.Bind();
-                mainShader.SetFloat("radius", planetRadius);
+                mainShader.SetFloat("radius", settings.planetRadius);
             }
             
-            if (ImGui::Checkbox("Enable Curveature", (bool*)&enableCurvature)) {
+            if (ImGui::Checkbox("Enable Curveature", (bool*)&settings.enableCurvature)) {
                 mainShader.Bind();
-                mainShader.SetBool("enableCurvature", enableCurvature);
+                mainShader.SetBool("enableCurvature", settings.enableCurvature);
             }
 
         } ImGui::End();
@@ -260,13 +263,13 @@ int main() {
 
             for (int x = 0; x < n; ++x) {
                 for (int z = 0; z < n; ++z) {
-                    double noise = perlin.octave2D_01((double)x * (double)xMult, (double)z * (double)yMult, octaves);
-                    noise *= percentOfBlocksAffected;
+                    double noise = perlin.octave2D_01((double)x * (double)settings.noise.xMult, (double)z * (double)settings.noise.yMult, settings.noise.octaves);
+                    noise *= settings.noise.percentOfBlocksAffected;
                     noise += 1.0;
-                    noise -= percentOfBlocksAffected;
+                    noise -= settings.noise.percentOfBlocksAffected;
 
-                    noise *= noiseMult;
-                    noise += noiseOffset;
+                    noise *= settings.noise.noiseMult;
+                    noise += settings.noise.noiseOffset;
 
                     noise *= (double)n;
 
