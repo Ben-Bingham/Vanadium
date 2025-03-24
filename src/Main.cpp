@@ -20,6 +20,7 @@
 #include "Chunks/CleanGrid.h"
 #include "Chunks/GenerateGeometry.h"
 #include "Chunks/GenerateChunk.h"
+#include "Chunks/CleanGrid.h"
 #include "Settings.h"
 #include "GUI.h"
 
@@ -93,14 +94,10 @@ int main() {
     }
 
     std::vector<Vanadium::Chunk> chunks{ };
-    std::vector<Vanadium::GlChunk> glChunks{ };
-    std::vector<bool> remakeGrid{ };
 
     chunks.resize(desiredChunks.size());
-    glChunks.resize(desiredChunks.size());
-    remakeGrid.resize(desiredChunks.size());
 
-    for (auto& chunk : glChunks) {
+    for (auto& chunk : chunks) {
         chunk.vao = std::make_unique<VertexAttributeObject>();
         chunk.vbo = std::make_unique<VertexBufferObject>();
         chunk.ebo = std::make_unique<ElementBufferObject>();
@@ -113,10 +110,6 @@ int main() {
 
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(6 * sizeof(float)));
         glEnableVertexAttribArray(2);
-    }
-
-    for (size_t i = 0; i < remakeGrid.size(); ++i) {
-        remakeGrid[i] = true;
     }
 
     mainShader.Bind();
@@ -136,21 +129,30 @@ int main() {
         Vanadium::GUI(settings, rg, n, mainShader, phong, dirLight, dt);
 
         if (rg) {
-            for (size_t i = 0; i < remakeGrid.size(); ++i) {
-                remakeGrid[i] = true;
+            for (auto& chunk : chunks) {
+                chunk.remakeChunk = true;
             }
         }
         
-        for (size_t i = 0; i < remakeGrid.size(); ++i) {
-            if (remakeGrid[i]) {
-                chunks[i] = Vanadium::GenerateChunk(desiredChunks[i], settings, n, 2, 2);
+        size_t i = 0;
+        for (auto& dc : desiredChunks) {
+            auto& chunk = chunks[i];
+            if (chunk.remakeChunk) {
 
-                glChunks[i].vao->Bind();
-                glChunks[i].vbo->UpdateData(Vanadium::VerticesAsFloatVector(chunks[i].geometry.vertices));
-                glChunks[i].ebo->UpdateData(chunks[i].geometry.indices);
+                chunk.position = dc;
 
-                remakeGrid[i] = false;
+                chunk.grid = Vanadium::CreateGrid(chunk.position, n, settings);
+                chunk.grid = Vanadium::CleanGrid(chunk.grid, n);
+                chunk.geometry = Vanadium::GenerateGeometry(chunk.position, chunk.grid, n, 2, 2);
+
+                chunk.vao->Bind();
+                chunk.vbo->UpdateData(Vanadium::VerticesAsFloatVector(chunks[i].geometry.vertices));
+                chunk.ebo->UpdateData(chunks[i].geometry.indices);
+
+                chunk.remakeChunk = false;
             }
+
+            ++i;
         }
 
         // Basic interaction
@@ -196,11 +198,11 @@ int main() {
         glBindTexture(GL_TEXTURE_2D, atlas.Get());
 
         // Render
-        size_t i = 0;
-        for (auto& glChunk : glChunks) {
-            glChunk.vao->Bind();
+        i = 0;
+        for (auto& chunk : chunks) {
+            chunk.vao->Bind();
 
-            glDrawElements(GL_TRIANGLES, (unsigned int)chunks[i].geometry.indices.size(), GL_UNSIGNED_INT, nullptr);
+            glDrawElements(GL_TRIANGLES, (unsigned int)chunk.geometry.indices.size(), GL_UNSIGNED_INT, nullptr);
             ++i;
         }
 
