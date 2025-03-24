@@ -23,6 +23,7 @@
 #include "Chunks/CleanGrid.h"
 #include "Settings.h"
 #include "GUI.h"
+#include "JobSystem.h"
 
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
 void MouseMovementCallback(GLFWwindow* window, double x, double y);
@@ -83,19 +84,19 @@ int main() {
     int n = 8;
 
     int chunkDistance = 1;
-    std::vector<Vanadium::ChunkPosition> desiredChunks{ };
+    std::vector<Vanadium::Job> jobs{ };
 
     for (int x = -chunkDistance; x < chunkDistance + 1; ++x) {
         for (int y = -chunkDistance; y < chunkDistance + 1; ++y) {
             for (int z = -chunkDistance; z < chunkDistance + 1; ++z) {
-                desiredChunks.push_back(Vanadium::ChunkPosition{ x, y, z });
+                jobs.push_back(Vanadium::Job{ { x, y, z }, 0 });
             }
         }
     }
 
     std::vector<Vanadium::Chunk> chunks{ };
 
-    chunks.resize(desiredChunks.size());
+    chunks.resize(jobs.size());
 
     for (auto& chunk : chunks) {
         chunk.vao = std::make_unique<VertexAttributeObject>();
@@ -135,11 +136,11 @@ int main() {
         }
         
         size_t i = 0;
-        for (auto& dc : desiredChunks) {
+        for (auto& job : jobs) {
             auto& chunk = chunks[i];
             if (chunk.remakeChunk) {
 
-                chunk.position = dc;
+                chunk.position = job.position;
 
                 chunk.grid = Vanadium::CreateGrid(chunk.position, n, settings);
                 chunk.grid = Vanadium::CleanGrid(chunk.grid, n);
