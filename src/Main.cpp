@@ -83,20 +83,21 @@ int main() {
     // Chunk Creation
     int n = 8;
 
-    int chunkDistance = 1;
-    std::vector<Vanadium::Job> jobs{ };
+    Vanadium::JobSystem jobSystem{ 8 };
+
+    int chunkDistance = 5;
 
     for (int x = -chunkDistance; x < chunkDistance + 1; ++x) {
-        for (int y = -chunkDistance; y < chunkDistance + 1; ++y) {
+        for (int y = -2; y < 1; ++y) {
             for (int z = -chunkDistance; z < chunkDistance + 1; ++z) {
-                jobs.push_back(Vanadium::Job{ { x, y, z }, 0 });
+                jobSystem.AddJob(Vanadium::Job{ { x, y, z }, 0 });
             }
         }
     }
 
-    std::vector<Vanadium::Chunk> chunks{ };
+    jobSystem.WaitForCompletion();
 
-    chunks.resize(jobs.size());
+    std::vector<Vanadium::Chunk> chunks = jobSystem.GetResults();
 
     for (auto& chunk : chunks) {
         chunk.vao = std::make_unique<VertexAttributeObject>();
@@ -111,6 +112,10 @@ int main() {
 
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(6 * sizeof(float)));
         glEnableVertexAttribArray(2);
+
+        chunk.vao->Bind();
+        chunk.vbo->UpdateData(Vanadium::VerticesAsFloatVector(chunk.geometry.vertices));
+        chunk.ebo->UpdateData(chunk.geometry.indices);
     }
 
     mainShader.Bind();
@@ -135,26 +140,26 @@ int main() {
             }
         }
         
-        size_t i = 0;
-        for (auto& job : jobs) {
-            auto& chunk = chunks[i];
-            if (chunk.remakeChunk) {
+        //size_t i = 0;
+        //for (auto& job : jobs) {
+        //    auto& chunk = chunks[i];
+        //    if (chunk.remakeChunk) {
 
-                chunk.position = job.position;
+        //        chunk.position = job.position;
 
-                chunk.grid = Vanadium::CreateGrid(chunk.position, n, settings);
-                chunk.grid = Vanadium::CleanGrid(chunk.grid, n);
-                chunk.geometry = Vanadium::GenerateGeometry(chunk.position, chunk.grid, n, 2, 2);
+        //        chunk.grid = Vanadium::CreateGrid(chunk.position, n, settings);
+        //        chunk.grid = Vanadium::CleanGrid(chunk.grid, n);
+        //        chunk.geometry = Vanadium::GenerateGeometry(chunk.position, chunk.grid, n, 2, 2);
 
-                chunk.vao->Bind();
-                chunk.vbo->UpdateData(Vanadium::VerticesAsFloatVector(chunks[i].geometry.vertices));
-                chunk.ebo->UpdateData(chunks[i].geometry.indices);
+        //        chunk.vao->Bind();
+        //        chunk.vbo->UpdateData(Vanadium::VerticesAsFloatVector(chunks[i].geometry.vertices));
+        //        chunk.ebo->UpdateData(chunks[i].geometry.indices);
 
-                chunk.remakeChunk = false;
-            }
+        //        chunk.remakeChunk = false;
+        //    }
 
-            ++i;
-        }
+        //    ++i;
+        //}
 
         // Basic interaction
         if (glfwGetKey(window->handle, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window->handle, true);
@@ -199,7 +204,7 @@ int main() {
         glBindTexture(GL_TEXTURE_2D, atlas.Get());
 
         // Render
-        i = 0;
+        size_t i = 0;
         for (auto& chunk : chunks) {
             chunk.vao->Bind();
 
