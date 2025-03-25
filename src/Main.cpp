@@ -50,14 +50,14 @@ int main() {
     Vanadium::Settings settings{ };
 
     // Texture Atlas
-    Texture::Parameters p {
-        Texture::Format::RGB,
-        Texture::StorageType::UNSIGNED_BYTE,
-        Texture::WrapMode::REPEAT,
-        Texture::FilteringMode::NEAREST
+    Texture2D::Parameters p {
+        Texture2D::Format::RGB,
+        Texture2D::StorageType::UNSIGNED_BYTE,
+        Texture2D::WrapMode::REPEAT,
+        Texture2D::FilteringMode::NEAREST
     };
 
-    Texture atlas{ "assets\\blocks\\atlas.png", p, false };
+    Texture2D atlas{ "assets\\blocks\\atlas.png", p, false };
     mainShader.Bind();
     mainShader.SetInt("textureAtlas", 0);
 
