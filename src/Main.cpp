@@ -50,16 +50,21 @@ int main() {
     Vanadium::Settings settings{ };
 
     // Texture Atlas
-    Texture2D::Parameters p {
-        Texture2D::Format::RGB,
-        Texture2D::StorageType::UNSIGNED_BYTE,
-        Texture2D::WrapMode::REPEAT,
-        Texture2D::FilteringMode::NEAREST
+    TextureParameters p {
+        TextureFormat::RGB,
+        TextureStorageType::UNSIGNED_BYTE,
+        TextureWrapMode::REPEAT,
+        TextureFilteringMode::NEAREST
     };
 
-    Texture2D atlas{ "assets\\blocks\\atlas.png", p, false };
+    Texture2D_Array atlas{ {
+        "assets\\blocks\\dirt.png",
+        "assets\\blocks\\grass.png",
+        "assets\\blocks\\stone.png"
+    }, p, false };
+
     mainShader.Bind();
-    mainShader.SetInt("textureAtlas", 0);
+    mainShader.SetInt("newAtlas", 0);
 
     // Basic OpenGL settings
     glFrontFace(GL_CCW);
@@ -278,7 +283,7 @@ int main() {
         mainShader.SetVec3("phong.specular", phong.specular);
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, atlas.Get());
+        atlas.Bind();
 
         // Render
         size_t i = 0;

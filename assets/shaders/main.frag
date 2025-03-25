@@ -24,6 +24,8 @@ out vec4 outFragColor;
 uniform vec3 cameraPosition;
 uniform sampler2D textureAtlas;
 
+uniform sampler2DArray newAtlas;
+
 in vec3 normal;
 in vec3 fragPosition;
 in vec2 uv;
@@ -45,7 +47,7 @@ vec3 DirectionalLightAddition(DirectionalLight light, Phong phong, vec3 normal, 
     vec3 reflectDirection = reflect(-lightDirection, normal);
     float spec = pow(max(dot(viewDir, reflectDirection), 0.0), phong.shininess);
 
-    vec3 ambient = texture(textureAtlas, uv).xyz * phong.ambient;
+    vec3 ambient = texture(newAtlas, vec3(uv, 2.0)).xyz * phong.ambient;
 
     vec3 diffuse = light.diffuse * diff * phong.diffuse;
     vec3 specular = light.specular * spec * phong.specular;
