@@ -225,9 +225,13 @@ int main() {
         //Vanadium::ChunkPosition delta = chunkCamPosition - lastChunkCamPosition; // TODO
 
         if (chunkCamPosition != lastChunkCamPosition) {
+            std::vector<Vanadium::ChunkPosition> allowedChunkPositions{ };
+
             for (int x = chunkCamPosition.x - chunkDistance; x < chunkCamPosition.x + chunkDistance + 1; ++x) {
                 for (int y = chunkCamPosition.y - chunkDistance; y < chunkCamPosition.y + chunkDistance + 1; ++y) {
                     for (int z = chunkCamPosition.z - chunkDistance; z < chunkCamPosition.z + chunkDistance + 1; ++z) {
+                        allowedChunkPositions.push_back(Vanadium::ChunkPosition{ x, y, z });
+
                         if (std::find_if(chunks.begin(), chunks.end(), [&](const auto& c) { return Vanadium::ChunkPosition{ x, y, z } == c.position; }) != chunks.end()) {
                             continue;
                         }
@@ -236,6 +240,14 @@ int main() {
                     }
                 }
             }
+
+            std::erase_if(chunks, [&](const Vanadium::Chunk& c){
+                if (std::find_if(allowedChunkPositions.begin(), allowedChunkPositions.end(), [&](const auto& ch) { return c.position == ch; }) != allowedChunkPositions.end()) {
+                    return false;
+                }
+
+                return true;
+            });
         }
 
         lastCamPos = cam.position;
