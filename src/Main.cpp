@@ -81,15 +81,17 @@ int main() {
     phong.shininess = 32.0;
 
     // Initial Chunk Creation
-    int n = 16;
+    int n = 8;
 
     Vanadium::JobSystem jobSystem{ 8 };
 
-    int chunkDistance = 3;
+    int chunkDistance = 5; // Number of chunks in each cardinal direction (Including up and down) past the players current chunk
 
-    for (int x = -chunkDistance; x < chunkDistance + 1; ++x) {
-        for (int y = -2; y < 1; ++y) {
-            for (int z = -chunkDistance; z < chunkDistance + 1; ++z) {
+    Vanadium::ChunkPosition chunkCamPosition = Vanadium::ChunkPosition{ glm::floor(cam.position / (float)n) };
+
+    for (int x = chunkCamPosition.x - chunkDistance; x < chunkCamPosition.x + chunkDistance + 1; ++x) {
+        for (int y = chunkCamPosition.y - chunkDistance; y < chunkCamPosition.y + chunkDistance + 1; ++y) {
+            for (int z = chunkCamPosition.z - chunkDistance; z < chunkCamPosition.z + chunkDistance + 1; ++z) {
                 jobSystem.AddJob(Vanadium::Job{ { x, y, z }, settings, n, 0 });
             }
         }
@@ -122,6 +124,8 @@ int main() {
     mainShader.SetFloat("radius", settings.planetRadius);
     mainShader.SetInt("enableCurvature", settings.enableCurvature);
 
+    glm::vec3 lastCamPos = cam.position;
+
     float lastFrame{ 0.0f };
     while (!glfwWindowShouldClose(window->handle)) {
         float currentFrame = (float)glfwGetTime();
@@ -133,7 +137,6 @@ int main() {
         std::vector<Vanadium::Chunk> newChunks = jobSystem.GetResults();
 
         for (auto& chunk : newChunks) {
-
             auto found = std::find_if(chunks.begin(), chunks.end(), [&](const auto& c) { return chunk.position == c.position; });
             if (found != chunks.end()) {
                 chunks.erase(found);
@@ -166,10 +169,12 @@ int main() {
         Vanadium::GUI(settings, rg, n, mainShader, phong, dirLight, dt);
 
         // Remaking all chunks due to updated settings
-        if (rg) { // Remake all chunks
-            for (int x = -chunkDistance; x < chunkDistance + 1; ++x) {
-                for (int y = -2; y < 1; ++y) {
-                    for (int z = -chunkDistance; z < chunkDistance + 1; ++z) {
+        if (rg) {
+            Vanadium::ChunkPosition chunkCamPosition = Vanadium::ChunkPosition{ glm::floor(cam.position / (float)n) };
+
+            for (int x = chunkCamPosition.x - chunkDistance; x < chunkCamPosition.x + chunkDistance + 1; ++x) {
+                for (int y = chunkCamPosition.y - chunkDistance; y < chunkCamPosition.y + chunkDistance + 1; ++y) {
+                    for (int z = chunkCamPosition.z - chunkDistance; z < chunkCamPosition.z + chunkDistance + 1; ++z) {
                         jobSystem.AddJob(Vanadium::Job{ { x, y, z }, settings, n, 0 });
                     }
                 }
@@ -212,6 +217,28 @@ int main() {
         if (glfwGetKey(window->handle, GLFW_KEY_D) == GLFW_PRESS) cam.position += cam.right * cam.movementSpeed * dt;
         if (glfwGetKey(window->handle, GLFW_KEY_SPACE) == GLFW_PRESS) cam.position += cam.up * cam.movementSpeed * dt;
         if (glfwGetKey(window->handle, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) cam.position -= cam.up * cam.movementSpeed * dt;
+
+        // Chunk Boundry Crossing
+        Vanadium::ChunkPosition chunkCamPosition = Vanadium::ChunkPosition{ glm::floor(cam.position / (float)n) };
+        Vanadium::ChunkPosition lastChunkCamPosition = Vanadium::ChunkPosition{ glm::floor(lastCamPos / (float)n) };
+
+        //Vanadium::ChunkPosition delta = chunkCamPosition - lastChunkCamPosition; // TODO
+
+        if (chunkCamPosition != lastChunkCamPosition) {
+            for (int x = chunkCamPosition.x - chunkDistance; x < chunkCamPosition.x + chunkDistance + 1; ++x) {
+                for (int y = chunkCamPosition.y - chunkDistance; y < chunkCamPosition.y + chunkDistance + 1; ++y) {
+                    for (int z = chunkCamPosition.z - chunkDistance; z < chunkCamPosition.z + chunkDistance + 1; ++z) {
+                        if (std::find_if(chunks.begin(), chunks.end(), [&](const auto& c) { return Vanadium::ChunkPosition{ x, y, z } == c.position; }) != chunks.end()) {
+                            continue;
+                        }
+
+                        jobSystem.AddJob(Vanadium::Job{ { x, y, z }, settings, n, 0 });
+                    }
+                }
+            }
+        }
+
+        lastCamPos = cam.position;
 
         // Prep for rendering
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);

@@ -28,6 +28,13 @@ namespace Vanadium {
                 maxHeight -= (cPos.y * n);
 
                 for (int y = 0; y < n; ++y) {
+                    //if ((cPos.x + cPos.y + cPos.z) % 2 == 0) {
+                    //    grid[x][y][z] = 1;
+                    //}
+                    //else {
+                    //    grid[x][y][z] = 2;
+                    //}
+                    
                     if (y > maxHeight) {
                         grid[x][y][z] = 0;
 

@@ -66,7 +66,11 @@ namespace Vanadium {
 					if (grid[x][y][z] == 0) continue;
 
                     glm::mat4 translation{ 1.0f };
-                    translation = glm::translate(translation, glm::vec3{ (float)(x + (position.x * n)), (float)(y + (position.y * n)), (float)(z + (position.z * n))});
+                    translation = glm::translate(translation, glm::vec3{ 
+                        (float)(x + (position.x * n)) + 0.5f, 
+                        (float)(y + (position.y * n)) + 0.5f, 
+                        (float)(z + (position.z * n)) + 0.5f
+                    });
 
                     std::vector<Vertex> vertices = cubeVertices;
                     for (auto& v : vertices) {

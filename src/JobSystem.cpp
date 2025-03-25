@@ -83,6 +83,7 @@ namespace Vanadium {
 			chunk.position = job.position;
 
 			chunk.grid = Vanadium::CreateGrid(chunk.position, job.chunkSize, job.settings);
+
 			chunk.grid = Vanadium::CleanGrid(chunk.grid, job.chunkSize);
 			chunk.geometry = Vanadium::GenerateGeometry(chunk.position, chunk.grid, job.chunkSize, 2, 2);
 
