@@ -114,19 +114,9 @@ namespace Vanadium {
     std::vector<float> VerticesAsFloatVector(const std::vector<Vertex>& vertices) {
         std::vector<float> newVertices{ };
 
-        for (size_t i = 0; i < vertices.size(); ++i) {
-            const Vertex& vert = vertices[i];
-            newVertices.push_back(vert.position.x);
-            newVertices.push_back(vert.position.y);
-            newVertices.push_back(vert.position.z);
+        newVertices.resize(vertices.size() * sizeof(Vertex));
 
-            newVertices.push_back(vert.normal.x);
-            newVertices.push_back(vert.normal.y);
-            newVertices.push_back(vert.normal.z);
-
-            newVertices.push_back(vert.uv.x);
-            newVertices.push_back(vert.uv.y);
-        }
+        std::memcpy(newVertices.data(), vertices.data(), vertices.size() * sizeof(Vertex));
 
         return newVertices;
     }

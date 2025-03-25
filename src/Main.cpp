@@ -80,17 +80,17 @@ int main() {
     phong.specular = phong.ambient * 0.3f;
     phong.shininess = 32.0;
 
-    // Chunk Creation
-    int n = 8;
+    // Initial Chunk Creation
+    int n = 16;
 
     Vanadium::JobSystem jobSystem{ 8 };
 
-    int chunkDistance = 5;
+    int chunkDistance = 3;
 
     for (int x = -chunkDistance; x < chunkDistance + 1; ++x) {
         for (int y = -2; y < 1; ++y) {
             for (int z = -chunkDistance; z < chunkDistance + 1; ++z) {
-                jobSystem.AddJob(Vanadium::Job{ { x, y, z }, 0 });
+                jobSystem.AddJob(Vanadium::Job{ { x, y, z }, settings, n, 0 });
             }
         }
     }
@@ -129,37 +129,75 @@ int main() {
         float dt = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
+        // Fetching new chunks
+        std::vector<Vanadium::Chunk> newChunks = jobSystem.GetResults();
+
+        for (auto& chunk : newChunks) {
+
+            auto found = std::find_if(chunks.begin(), chunks.end(), [&](const auto& c) { return chunk.position == c.position; });
+            if (found != chunks.end()) {
+                chunks.erase(found);
+            }
+
+            chunk.vao = std::make_unique<VertexAttributeObject>();
+            chunk.vbo = std::make_unique<VertexBufferObject>();
+            chunk.ebo = std::make_unique<ElementBufferObject>();
+
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
+            glEnableVertexAttribArray(0);
+
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(3 * sizeof(float)));
+            glEnableVertexAttribArray(1);
+
+            glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(6 * sizeof(float)));
+            glEnableVertexAttribArray(2);
+
+            chunk.vao->Bind();
+
+            chunk.vbo->UpdateData(Vanadium::VerticesAsFloatVector(chunk.geometry.vertices));
+            chunk.ebo->UpdateData(chunk.geometry.indices);
+
+            chunks.push_back(std::move(chunk));
+        }
+
         imGui.StartNewFrame();
         
         bool rg = false;
         Vanadium::GUI(settings, rg, n, mainShader, phong, dirLight, dt);
 
-        if (rg) {
+        // Remaking all chunks due to updated settings
+        if (rg) { // Remake all chunks
+            for (int x = -chunkDistance; x < chunkDistance + 1; ++x) {
+                for (int y = -2; y < 1; ++y) {
+                    for (int z = -chunkDistance; z < chunkDistance + 1; ++z) {
+                        jobSystem.AddJob(Vanadium::Job{ { x, y, z }, settings, n, 0 });
+                    }
+                }
+            }
+
+            chunks.clear();
+
+            chunks = jobSystem.GetResults();
+
             for (auto& chunk : chunks) {
-                chunk.remakeChunk = true;
+                chunk.vao = std::make_unique<VertexAttributeObject>();
+                chunk.vbo = std::make_unique<VertexBufferObject>();
+                chunk.ebo = std::make_unique<ElementBufferObject>();
+
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)0);
+                glEnableVertexAttribArray(0);
+
+                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(3 * sizeof(float)));
+                glEnableVertexAttribArray(1);
+
+                glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, (void*)(6 * sizeof(float)));
+                glEnableVertexAttribArray(2);
+
+                chunk.vao->Bind();
+                chunk.vbo->UpdateData(Vanadium::VerticesAsFloatVector(chunk.geometry.vertices));
+                chunk.ebo->UpdateData(chunk.geometry.indices);
             }
         }
-        
-        //size_t i = 0;
-        //for (auto& job : jobs) {
-        //    auto& chunk = chunks[i];
-        //    if (chunk.remakeChunk) {
-
-        //        chunk.position = job.position;
-
-        //        chunk.grid = Vanadium::CreateGrid(chunk.position, n, settings);
-        //        chunk.grid = Vanadium::CleanGrid(chunk.grid, n);
-        //        chunk.geometry = Vanadium::GenerateGeometry(chunk.position, chunk.grid, n, 2, 2);
-
-        //        chunk.vao->Bind();
-        //        chunk.vbo->UpdateData(Vanadium::VerticesAsFloatVector(chunks[i].geometry.vertices));
-        //        chunk.ebo->UpdateData(chunks[i].geometry.indices);
-
-        //        chunk.remakeChunk = false;
-        //    }
-
-        //    ++i;
-        //}
 
         // Basic interaction
         if (glfwGetKey(window->handle, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window->handle, true);

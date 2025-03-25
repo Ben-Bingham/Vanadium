@@ -3,10 +3,15 @@
 #include <vector>
 
 #include "Chunks/Chunk.h"
+#include "Settings.h"
 
 namespace Vanadium {
 	struct Job {
 		ChunkPosition position{ };
+
+		Settings settings{ };
+
+		int chunkSize{ 8 };
 
 		size_t priority{ 0 }; // Higher is more urgent
 	};

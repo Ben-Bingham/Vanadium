@@ -8,7 +8,6 @@
 
 namespace Vanadium {
 	JobSystem::JobSystem(size_t threadCount) {
-		std::cout << "Creating job system" << std::endl;
 		for (size_t i = 0; i < threadCount; ++i) {
 			m_Threads.emplace_back(&JobSystem::ThreadLoop, this);
 		}
@@ -24,8 +23,6 @@ namespace Vanadium {
 		for (auto& thread : m_Threads) {
 			thread.join();
 		}
-
-		std::cout << "Closed job system" << std::endl;
 	}
 
 	void JobSystem::AddJob(const Job& j) {
@@ -85,10 +82,9 @@ namespace Vanadium {
 
 			chunk.position = job.position;
 
-			int n = 16; // TODO
-			chunk.grid = Vanadium::CreateGrid(chunk.position, n, Settings{ }); // TODO settings
-			chunk.grid = Vanadium::CleanGrid(chunk.grid, n);
-			chunk.geometry = Vanadium::GenerateGeometry(chunk.position, chunk.grid, n, 2, 2);
+			chunk.grid = Vanadium::CreateGrid(chunk.position, job.chunkSize, job.settings);
+			chunk.grid = Vanadium::CleanGrid(chunk.grid, job.chunkSize);
+			chunk.geometry = Vanadium::GenerateGeometry(chunk.position, chunk.grid, job.chunkSize, 2, 2);
 
 			chunk.remakeChunk = false;
 
