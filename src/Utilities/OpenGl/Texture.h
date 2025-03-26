@@ -104,26 +104,55 @@ public:
         glTexParameteri(TEXTURE_TYPE, GL_TEXTURE_MIN_FILTER, (int)parameters.minFilter);
         glTexParameteri(TEXTURE_TYPE, GL_TEXTURE_MAG_FILTER, (int)parameters.magFilter);
 
-        int width, height, nrChannels;
+        std::vector<std::vector<unsigned char>> data;
+        int width{ -1 };
+        int height{ -1 };
+        int channels{ -1 };
 
-        glTexStorage3D(TEXTURE_TYPE, 3, GL_RGB8, 16, 16, (int)paths.size());
+        data.resize(paths.size());
 
         stbi_set_flip_vertically_on_load(flip);
-        int i = 0;
+
+        size_t i = 0;
         for (auto& path : paths) {
-            unsigned char* d = stbi_load(path.c_str(), &width, &height, &nrChannels, 3);
+            int w, h, c;
+            unsigned char* d = stbi_load(path.c_str(), &w, &h, &c, 3);
+
+            if ((w != width && width != -1) || (h != height && height != -1)) {
+                std::cout << "Not all images: " << std::endl;
+                
+                for (auto& path : paths) {
+                    std::cout << "  " << path << std::endl;
+                }
+
+                std::cout << "are the same size, cannot create texture" << std::endl;
+
+                return;
+            }
+
+            width = w;
+            height = h;
+            channels = c;
 
             if (d) {
-                glTexSubImage3D(TEXTURE_TYPE, 0, 0, 0, (int)i, width, height, 1, GL_RGB, GL_UNSIGNED_BYTE, (void*)d);
+                data[i].resize(width * height * 3);
+
+                std::memcpy((void*)data[i].data(), (void*)d, data[i].size());
+
+                stbi_image_free(d);
             }
             else {
                 std::cout << "Failed to load texture: " << path << std::endl;
                 return;
-            }      
-
-            stbi_image_free(d);
+            }
 
             ++i;
+        }
+
+        glTexStorage3D(TEXTURE_TYPE, 3, GL_RGB8, width, height, (int)paths.size());
+
+        for (size_t i = 0; i < data.size(); ++i) {
+            glTexSubImage3D(TEXTURE_TYPE, 0, 0, 0, (int)i, width, height, 1, GL_RGB, GL_UNSIGNED_BYTE, (void*)data[i].data());
         }
 
         glGenerateMipmap(TEXTURE_TYPE);
