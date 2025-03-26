@@ -294,6 +294,7 @@ int main() {
         // Render
         size_t i = 0;
         for (auto& chunk : chunks) {
+            if (chunk.geometry.indices.size() == 0) continue; // TODO make sure these are not even added
             chunk.vao->Bind();
 
             glDrawElements(GL_TRIANGLES, (unsigned int)chunk.geometry.indices.size(), GL_UNSIGNED_INT, nullptr);
