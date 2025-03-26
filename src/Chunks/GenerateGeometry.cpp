@@ -129,17 +129,17 @@ namespace Vanadium {
                         std::vector<Index> ind = faceIndices;
 
                         for (auto& in : ind) {
-                            in += 4 * i;
+                            in += (Index)(4 * i);
                         }
 
-                        indices.insert(indices.end(), faceIndices.begin(), faceIndices.end());
+                        indices.insert(indices.end(), ind.begin(), ind.end());
                     }
 
                     for (auto& i : indices) {
                         i += highestIndex;
                     }
 
-                    highestIndex += faceCount * 4;
+                    highestIndex += (int)(faceCount * 4);
 
                     geo.indices.insert(geo.indices.end(), indices.begin(), indices.end());
 				}
