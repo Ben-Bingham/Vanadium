@@ -3,6 +3,7 @@
 layout (location = 0) in vec3 inPos;
 layout (location = 1) in vec3 inNormal;
 layout (location = 2) in vec2 inUv;
+layout (location = 3) in float inBlockIndex;
 
 uniform mat4 vp;
 uniform mat4 model;
@@ -10,6 +11,7 @@ uniform mat4 model;
 out vec3 normal;
 out vec3 fragPosition;
 out vec2 uv;
+out float blockIndex;
 
 uniform vec3 cameraPosition;
 
@@ -30,4 +32,5 @@ void main() {
 	fragPosition = vec3(model * vec4(inPos, 1.0));
 
 	uv = inUv;
+	blockIndex = inBlockIndex;
 }

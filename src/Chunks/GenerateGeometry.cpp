@@ -4,35 +4,35 @@
 
 namespace Vanadium {
     std::vector<Vertex> cubeVertices {
-        Vertex{ glm::vec3{ -0.5f, -0.5f, -0.5f }, glm::vec3{ 0.0f,  0.0f, -1.0f }, glm::vec2{ 0.0f, 0.0f } },
-        Vertex{ glm::vec3{  0.5f, -0.5f, -0.5f }, glm::vec3{ 0.0f,  0.0f, -1.0f }, glm::vec2{ 1.0f, 0.0f } },
-        Vertex{ glm::vec3{  0.5f,  0.5f, -0.5f }, glm::vec3{ 0.0f,  0.0f, -1.0f }, glm::vec2{ 1.0f, 1.0f } },
-        Vertex{ glm::vec3{ -0.5f,  0.5f, -0.5f }, glm::vec3{ 0.0f,  0.0f, -1.0f }, glm::vec2{ 0.0f, 1.0f } },
+        Vertex{ glm::vec3{ -0.5f, -0.5f, -0.5f }, glm::vec3{ 0.0f,  0.0f, -1.0f }, glm::vec2{ 0.0f, 0.0f }, 0.0f },
+        Vertex{ glm::vec3{  0.5f, -0.5f, -0.5f }, glm::vec3{ 0.0f,  0.0f, -1.0f }, glm::vec2{ 1.0f, 0.0f }, 0.0f },
+        Vertex{ glm::vec3{  0.5f,  0.5f, -0.5f }, glm::vec3{ 0.0f,  0.0f, -1.0f }, glm::vec2{ 1.0f, 1.0f }, 0.0f },
+        Vertex{ glm::vec3{ -0.5f,  0.5f, -0.5f }, glm::vec3{ 0.0f,  0.0f, -1.0f }, glm::vec2{ 0.0f, 1.0f }, 0.0f },
 
-        Vertex{ glm::vec3{ -0.5f, -0.5f,  0.5f }, glm::vec3{ 0.0f,  0.0f,  1.0f }, glm::vec2{ 0.0f, 0.0f } },
-        Vertex{ glm::vec3{  0.5f, -0.5f,  0.5f }, glm::vec3{ 0.0f,  0.0f,  1.0f }, glm::vec2{ 1.0f, 0.0f } },
-        Vertex{ glm::vec3{  0.5f,  0.5f,  0.5f }, glm::vec3{ 0.0f,  0.0f,  1.0f }, glm::vec2{ 1.0f, 1.0f } },
-        Vertex{ glm::vec3{ -0.5f,  0.5f,  0.5f }, glm::vec3{ 0.0f,  0.0f,  1.0f }, glm::vec2{ 0.0f, 1.0f } },
+        Vertex{ glm::vec3{ -0.5f, -0.5f,  0.5f }, glm::vec3{ 0.0f,  0.0f,  1.0f }, glm::vec2{ 0.0f, 0.0f }, 0.0f },
+        Vertex{ glm::vec3{  0.5f, -0.5f,  0.5f }, glm::vec3{ 0.0f,  0.0f,  1.0f }, glm::vec2{ 1.0f, 0.0f }, 0.0f },
+        Vertex{ glm::vec3{  0.5f,  0.5f,  0.5f }, glm::vec3{ 0.0f,  0.0f,  1.0f }, glm::vec2{ 1.0f, 1.0f }, 0.0f },
+        Vertex{ glm::vec3{ -0.5f,  0.5f,  0.5f }, glm::vec3{ 0.0f,  0.0f,  1.0f }, glm::vec2{ 0.0f, 1.0f }, 0.0f },
 
-        Vertex{ glm::vec3{ -0.5f,  0.5f,  0.5f }, glm::vec3{-1.0f,  0.0f,  0.0f }, glm::vec2{ 1.0f, 0.0f } },
-        Vertex{ glm::vec3{ -0.5f,  0.5f, -0.5f }, glm::vec3{-1.0f,  0.0f,  0.0f }, glm::vec2{ 1.0f, 1.0f } },
-        Vertex{ glm::vec3{ -0.5f, -0.5f, -0.5f }, glm::vec3{-1.0f,  0.0f,  0.0f }, glm::vec2{ 0.0f, 1.0f } },
-        Vertex{ glm::vec3{ -0.5f, -0.5f,  0.5f }, glm::vec3{-1.0f,  0.0f,  0.0f }, glm::vec2{ 0.0f, 0.0f } },
+        Vertex{ glm::vec3{ -0.5f,  0.5f,  0.5f }, glm::vec3{-1.0f,  0.0f,  0.0f }, glm::vec2{ 1.0f, 0.0f }, 0.0f },
+        Vertex{ glm::vec3{ -0.5f,  0.5f, -0.5f }, glm::vec3{-1.0f,  0.0f,  0.0f }, glm::vec2{ 1.0f, 1.0f }, 0.0f },
+        Vertex{ glm::vec3{ -0.5f, -0.5f, -0.5f }, glm::vec3{-1.0f,  0.0f,  0.0f }, glm::vec2{ 0.0f, 1.0f }, 0.0f },
+        Vertex{ glm::vec3{ -0.5f, -0.5f,  0.5f }, glm::vec3{-1.0f,  0.0f,  0.0f }, glm::vec2{ 0.0f, 0.0f }, 0.0f },
 
-        Vertex{ glm::vec3{  0.5f,  0.5f,  0.5f }, glm::vec3{ 1.0f,  0.0f,  0.0f }, glm::vec2{ 1.0f, 0.0f } },
-        Vertex{ glm::vec3{  0.5f,  0.5f, -0.5f }, glm::vec3{ 1.0f,  0.0f,  0.0f }, glm::vec2{ 1.0f, 1.0f } },
-        Vertex{ glm::vec3{  0.5f, -0.5f, -0.5f }, glm::vec3{ 1.0f,  0.0f,  0.0f }, glm::vec2{ 0.0f, 1.0f } },
-        Vertex{ glm::vec3{  0.5f, -0.5f,  0.5f }, glm::vec3{ 1.0f,  0.0f,  0.0f }, glm::vec2{ 0.0f, 0.0f } },
+        Vertex{ glm::vec3{  0.5f,  0.5f,  0.5f }, glm::vec3{ 1.0f,  0.0f,  0.0f }, glm::vec2{ 1.0f, 0.0f }, 0.0f },
+        Vertex{ glm::vec3{  0.5f,  0.5f, -0.5f }, glm::vec3{ 1.0f,  0.0f,  0.0f }, glm::vec2{ 1.0f, 1.0f }, 0.0f },
+        Vertex{ glm::vec3{  0.5f, -0.5f, -0.5f }, glm::vec3{ 1.0f,  0.0f,  0.0f }, glm::vec2{ 0.0f, 1.0f }, 0.0f },
+        Vertex{ glm::vec3{  0.5f, -0.5f,  0.5f }, glm::vec3{ 1.0f,  0.0f,  0.0f }, glm::vec2{ 0.0f, 0.0f }, 0.0f },
 
-        Vertex{ glm::vec3{ -0.5f, -0.5f, -0.5f }, glm::vec3{ 0.0f, -1.0f,  0.0f }, glm::vec2{ 0.0f, 1.0f } },
-        Vertex{ glm::vec3{  0.5f, -0.5f, -0.5f }, glm::vec3{ 0.0f, -1.0f,  0.0f }, glm::vec2{ 1.0f, 1.0f } },
-        Vertex{ glm::vec3{  0.5f, -0.5f,  0.5f }, glm::vec3{ 0.0f, -1.0f,  0.0f }, glm::vec2{ 1.0f, 0.0f } },
-        Vertex{ glm::vec3{ -0.5f, -0.5f,  0.5f }, glm::vec3{ 0.0f, -1.0f,  0.0f }, glm::vec2{ 0.0f, 0.0f } },
+        Vertex{ glm::vec3{ -0.5f, -0.5f, -0.5f }, glm::vec3{ 0.0f, -1.0f,  0.0f }, glm::vec2{ 0.0f, 1.0f }, 0.0f },
+        Vertex{ glm::vec3{  0.5f, -0.5f, -0.5f }, glm::vec3{ 0.0f, -1.0f,  0.0f }, glm::vec2{ 1.0f, 1.0f }, 0.0f },
+        Vertex{ glm::vec3{  0.5f, -0.5f,  0.5f }, glm::vec3{ 0.0f, -1.0f,  0.0f }, glm::vec2{ 1.0f, 0.0f }, 0.0f },
+        Vertex{ glm::vec3{ -0.5f, -0.5f,  0.5f }, glm::vec3{ 0.0f, -1.0f,  0.0f }, glm::vec2{ 0.0f, 0.0f }, 0.0f },
 
-        Vertex{ glm::vec3{ -0.5f,  0.5f, -0.5f }, glm::vec3{ 0.0f,  1.0f,  0.0f }, glm::vec2{ 0.0f, 1.0f } },
-        Vertex{ glm::vec3{  0.5f,  0.5f, -0.5f }, glm::vec3{ 0.0f,  1.0f,  0.0f }, glm::vec2{ 1.0f, 1.0f } },
-        Vertex{ glm::vec3{  0.5f,  0.5f,  0.5f }, glm::vec3{ 0.0f,  1.0f,  0.0f }, glm::vec2{ 1.0f, 0.0f } },
-        Vertex{ glm::vec3{ -0.5f,  0.5f,  0.5f }, glm::vec3{ 0.0f,  1.0f,  0.0f }, glm::vec2{ 0.0f, 0.0f } }
+        Vertex{ glm::vec3{ -0.5f,  0.5f, -0.5f }, glm::vec3{ 0.0f,  1.0f,  0.0f }, glm::vec2{ 0.0f, 1.0f }, 0.0f },
+        Vertex{ glm::vec3{  0.5f,  0.5f, -0.5f }, glm::vec3{ 0.0f,  1.0f,  0.0f }, glm::vec2{ 1.0f, 1.0f }, 0.0f },
+        Vertex{ glm::vec3{  0.5f,  0.5f,  0.5f }, glm::vec3{ 0.0f,  1.0f,  0.0f }, glm::vec2{ 1.0f, 0.0f }, 0.0f },
+        Vertex{ glm::vec3{ -0.5f,  0.5f,  0.5f }, glm::vec3{ 0.0f,  1.0f,  0.0f }, glm::vec2{ 0.0f, 0.0f }, 0.0f }
     };
 
     std::vector<Index> cubeIndices{
@@ -66,11 +66,21 @@ namespace Vanadium {
 					if (grid[x][y][z] == 0) continue;
 
                     glm::mat4 translation{ 1.0f };
-                    translation = glm::translate(translation, glm::vec3{ 
-                        (float)(x + (position.x * n)) + 0.5f, 
-                        (float)(y + (position.y * n)) + 0.5f, 
+                    translation = glm::translate(translation, glm::vec3{
+                        (float)(x + (position.x * n)) + 0.5f,
+                        (float)(y + (position.y * n)) + 0.5f,
                         (float)(z + (position.z * n)) + 0.5f
                     });
+
+                    //Vanadium::BlockIndex px = 0, py = 0, pz = 0, nx = 0, ny = 0, nz = 0;
+
+                    //if (x + 1 < n) px = grid[x + 1][y][z];
+                    //if (y + 1 < n) py = grid[x][y + 1][z];
+                    //if (z + 1 < n) pz = grid[x][y][z + 1];
+
+                    //if (x - 1 >= 0) nx = grid[x - 1][y][z];
+                    //if (y - 1 >= 0) ny = grid[x][y - 1][z];
+                    //if (z - 1 >= 0) nz = grid[x][y][z - 1];
 
                     std::vector<Vertex> vertices = cubeVertices;
                     for (auto& v : vertices) {
@@ -82,19 +92,21 @@ namespace Vanadium {
                     }
 
                     for (auto& v : vertices) {
-                        glm::vec2 uv = v.uv;
-                        BlockIndex id = grid[x][y][z];
-                        int i = (int)id - 1;
+                        v.blockIndex = grid[x][y][z] - 1;
 
-                        int x = i % 2;
-                        int y = (int)std::floor((float)i / 2.0f);
+                        //glm::vec2 uv = v.uv;
+                        //BlockIndex id = grid[x][y][z];
+                        //int i = (int)id - 1;
 
-                        uv *= 0.5f;
+                        //int x = i % 2;
+                        //int y = (int)std::floor((float)i / 2.0f);
 
-                        uv.x += 0.5f * x;
-                        uv.y += 0.5f * y;
+                        //uv *= 0.5f;
 
-                        v.uv = uv;
+                        //uv.x += 0.5f * x;
+                        //uv.y += 0.5f * y;
+
+                        //v.uv = uv;
                     }
 
                     geo.vertices.insert(geo.vertices.end(), vertices.begin(), vertices.end());
