@@ -19,7 +19,6 @@
 #include "Chunks/GenerateGrid.h"
 #include "Chunks/CleanGrid.h"
 #include "Chunks/GenerateGeometry.h"
-#include "Chunks/GenerateChunk.h"
 #include "Chunks/CleanGrid.h"
 #include "Settings.h"
 #include "GUI.h"

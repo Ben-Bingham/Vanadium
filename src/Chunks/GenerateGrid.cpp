@@ -28,7 +28,7 @@ namespace Vanadium {
                 maxHeight -= (cPos.y * n);
 
                 for (int y = 0; y < n; ++y) {
-                    grid[x][y][z] = GenerateBlock(glm::ivec3{ x, y, z }, (float)maxHeight);
+                    grid[x][y][z] = GenerateBlock(glm::ivec3{ x, y, z } + (cPos * n), cPos, n, (float)maxHeight);
                 }
             }
         }
@@ -36,7 +36,7 @@ namespace Vanadium {
         return grid;
 	}
 
-    Grid CreatePartialGrid(
+    Grid CreatePartialGrid( // TODO
         const ChunkPosition& cPos,
         int n,
         const Settings& settings,
@@ -69,7 +69,7 @@ namespace Vanadium {
                 maxHeight -= (cPos.y * n);
 
                 for (int y = bottom.y; y < top.y; ++y) {
-                    grid[x][y][z] = GenerateBlock(glm::ivec3{ x, y, z }, (float)maxHeight);
+                    grid[x][y][z] = GenerateBlock(glm::ivec3{ x, y, z } + (cPos * n), cPos, n, (float)maxHeight);
                 }
             }
         }
@@ -77,7 +77,24 @@ namespace Vanadium {
         return grid;
     }
 
-    BlockIndex GenerateBlock(const glm::ivec3& pos, float noise) {
+    BlockIndex GenerateBlock(const glm::ivec3& pos, const ChunkPosition& cPos, int n, float noise) {
+        //if (pos.y >= 5) {
+        //    return 0;
+        //}
+        //
+        //glm::ivec3 lPos = pos - (cPos * n);
+        //
+        //if (lPos.x == lPos.z && lPos.x == 0) {
+        //    return 0;
+        //}
+        //
+        //if (lPos.x == lPos.z && lPos.x == 1) {
+        //    return 0;
+        //}
+        //
+        //return 1;
+
+
         if (pos.y > noise) {
             return 0;
         }

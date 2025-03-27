@@ -50,7 +50,16 @@ namespace Vanadium {
         0,  3,  2,
     };
 
-	Geometry GenerateGeometry(const ChunkPosition& position, const Grid& grid, int n, int atlasWidth, int atlasHeight) {
+	Geometry GenerateGeometry(
+        const ChunkPosition& position,
+        const Grid& grid,
+        int n,
+        const Grid& pxGrid,
+        const Grid& pyGrid,
+        const Grid& pzGrid,
+        const Grid& nxGrid,
+        const Grid& nyGrid,
+        const Grid& nzGrid) {
         Geometry geo{ };
 
         int highestIndex = 0;
@@ -69,13 +78,47 @@ namespace Vanadium {
 
                     Vanadium::BlockIndex px = 0, py = 0, pz = 0, nx = 0, ny = 0, nz = 0;
 
-                    if (x + 1 < n) px = grid[x + 1][y][z];
-                    if (y + 1 < n) py = grid[x][y + 1][z];
-                    if (z + 1 < n) pz = grid[x][y][z + 1];
+                    if (x + 1 < n) {
+                        px = grid[x + 1][y][z];
+                    }
+                    else {
+                        px = pxGrid[0][y][z];
+                    }
 
-                    if (x - 1 >= 0) nx = grid[x - 1][y][z];
-                    if (y - 1 >= 0) ny = grid[x][y - 1][z];
-                    if (z - 1 >= 0) nz = grid[x][y][z - 1];
+                    if (y + 1 < n) {
+                        py = grid[x][y + 1][z];
+                    }
+                    else {
+                        py = pyGrid[x][0][z];
+                    }
+
+                    if (z + 1 < n) {
+                        pz = grid[x][y][z + 1];
+                    }
+                    else {
+                        pz = pzGrid[x][y][0];
+                    }
+
+                    if (x - 1 >= 0) {
+                        nx = grid[x - 1][y][z];
+                    }
+                    else {
+                        nx = nxGrid[n - 1][y][z];
+                    }
+
+                    if (y - 1 >= 0) {
+                        ny = grid[x][y - 1][z];
+                    }
+                    else {
+                        ny = nyGrid[x][n - 1][z];
+                    }
+
+                    if (z - 1 >= 0) {
+                        nz = grid[x][y][z - 1];
+                    }
+                    else {
+                        nz = nzGrid[x][y][n - 1];
+                    }
 
                     std::vector<Vertex> vertices{ };
 

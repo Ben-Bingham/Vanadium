@@ -1,7 +1,6 @@
 #include "JobSystem.h"
 
 #include "Settings.h"
-#include "Chunks/GenerateChunk.h"
 #include "Chunks/GenerateGrid.h"
 #include "Chunks/CleanGrid.h"
 #include "Chunks/GenerateGeometry.h"
@@ -84,16 +83,35 @@ namespace Vanadium {
 
 			chunk.grid = CreateGrid(chunk.position, job.chunkSize, job.settings);
 
-			Grid pxGrid = CreatePartialGrid(
-				chunk.position + ChunkPosition{ 1, 0, 0 }, 
-				job.chunkSize, 
-				job.settings,
-				glm::ivec3{ 0, 0, 0 },
-				glm::ivec3{ 1, job.chunkSize, job.chunkSize }
+			Grid pxGrid = CreateGrid(chunk.position + ChunkPosition{ 1, 0, 0 }, job.chunkSize, job.settings);
+			Grid pyGrid = CreateGrid(chunk.position + ChunkPosition{ 0, 1, 0 }, job.chunkSize, job.settings);
+			Grid pzGrid = CreateGrid(chunk.position + ChunkPosition{ 0, 0, 1 }, job.chunkSize, job.settings);
+			Grid nxGrid = CreateGrid(chunk.position + ChunkPosition{ -1, 0, 0 }, job.chunkSize, job.settings);
+			Grid nyGrid = CreateGrid(chunk.position + ChunkPosition{ 0, -1, 0 }, job.chunkSize, job.settings);
+			Grid nzGrid = CreateGrid(chunk.position + ChunkPosition{ 0, 0, -1 }, job.chunkSize, job.settings);
+
+			chunk.grid = CleanGrid(
+				chunk.grid, 
+				job.chunkSize,
+				pxGrid,
+				pyGrid,
+				pzGrid,
+				nxGrid,
+				nyGrid,
+				nzGrid
 			);
 
-			chunk.grid = CleanGrid(chunk.grid, job.chunkSize);
-			chunk.geometry = GenerateGeometry(chunk.position, chunk.grid, job.chunkSize, 2, 2);
+			chunk.geometry = GenerateGeometry(
+				chunk.position, 
+				chunk.grid, 
+				job.chunkSize,
+				pxGrid,
+				pyGrid,
+				pzGrid,
+				nxGrid,
+				nyGrid,
+				nzGrid
+			);
 
 			chunk.remakeChunk = false;
 
