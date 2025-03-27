@@ -7,5 +7,13 @@
 #include "Chunk.h"
 
 namespace Vanadium {
-	Grid CreateGrid(const ChunkPosition& position, int n, const Settings& settings);
+	Grid CreateGrid(const ChunkPosition& cPos, int n, const Settings& settings);
+
+	Grid CreatePartialGrid(
+		const ChunkPosition& cPos,
+		int n,
+		const Settings& settings,
+		const glm::ivec3& bottom,
+		const glm::ivec3& top
+	);
 }

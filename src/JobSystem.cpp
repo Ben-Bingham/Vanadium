@@ -82,10 +82,18 @@ namespace Vanadium {
 
 			chunk.position = job.position;
 
-			chunk.grid = Vanadium::CreateGrid(chunk.position, job.chunkSize, job.settings);
+			chunk.grid = CreateGrid(chunk.position, job.chunkSize, job.settings);
 
-			chunk.grid = Vanadium::CleanGrid(chunk.grid, job.chunkSize);
-			chunk.geometry = Vanadium::GenerateGeometry(chunk.position, chunk.grid, job.chunkSize, 2, 2);
+			Grid pxGrid = CreatePartialGrid(
+				chunk.position + ChunkPosition{ 1, 0, 0 }, 
+				job.chunkSize, 
+				job.settings,
+				glm::ivec3{ 0, 0, 0 },
+				glm::ivec3{ 1, job.chunkSize, job.chunkSize }
+			);
+
+			chunk.grid = CleanGrid(chunk.grid, job.chunkSize);
+			chunk.geometry = GenerateGeometry(chunk.position, chunk.grid, job.chunkSize, 2, 2);
 
 			chunk.remakeChunk = false;
 

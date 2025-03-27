@@ -18,23 +18,23 @@ namespace Vanadium {
     };
 
     std::vector<Vertex> pzVerts{
-        Vertex{ glm::vec3{ -0.5f, -0.5f,  0.5f }, glm::vec3{ 0.0f,  0.0f,  1.0f }, glm::vec2{ 0.0f, 0.0f }, 0.0f },
-        Vertex{ glm::vec3{  0.5f, -0.5f,  0.5f }, glm::vec3{ 0.0f,  0.0f,  1.0f }, glm::vec2{ 1.0f, 0.0f }, 0.0f },
         Vertex{ glm::vec3{  0.5f,  0.5f,  0.5f }, glm::vec3{ 0.0f,  0.0f,  1.0f }, glm::vec2{ 1.0f, 1.0f }, 0.0f },
+        Vertex{ glm::vec3{  0.5f, -0.5f,  0.5f }, glm::vec3{ 0.0f,  0.0f,  1.0f }, glm::vec2{ 1.0f, 0.0f }, 0.0f },
+        Vertex{ glm::vec3{ -0.5f, -0.5f,  0.5f }, glm::vec3{ 0.0f,  0.0f,  1.0f }, glm::vec2{ 0.0f, 0.0f }, 0.0f },
         Vertex{ glm::vec3{ -0.5f,  0.5f,  0.5f }, glm::vec3{ 0.0f,  0.0f,  1.0f }, glm::vec2{ 0.0f, 1.0f }, 0.0f },
     };
 
     std::vector<Vertex> nxVerts{
-        Vertex{ glm::vec3{ -0.5f,  0.5f,  0.5f }, glm::vec3{-1.0f,  0.0f,  0.0f }, glm::vec2{ 1.0f, 0.0f }, 0.0f },
-        Vertex{ glm::vec3{ -0.5f,  0.5f, -0.5f }, glm::vec3{-1.0f,  0.0f,  0.0f }, glm::vec2{ 1.0f, 1.0f }, 0.0f },
         Vertex{ glm::vec3{ -0.5f, -0.5f, -0.5f }, glm::vec3{-1.0f,  0.0f,  0.0f }, glm::vec2{ 0.0f, 1.0f }, 0.0f },
+        Vertex{ glm::vec3{ -0.5f,  0.5f, -0.5f }, glm::vec3{-1.0f,  0.0f,  0.0f }, glm::vec2{ 1.0f, 1.0f }, 0.0f },
+        Vertex{ glm::vec3{ -0.5f,  0.5f,  0.5f }, glm::vec3{-1.0f,  0.0f,  0.0f }, glm::vec2{ 1.0f, 0.0f }, 0.0f },
         Vertex{ glm::vec3{ -0.5f, -0.5f,  0.5f }, glm::vec3{-1.0f,  0.0f,  0.0f }, glm::vec2{ 0.0f, 0.0f }, 0.0f },
     };
 
     std::vector<Vertex> nyVerts{
-        Vertex{ glm::vec3{ -0.5f, -0.5f, -0.5f }, glm::vec3{ 0.0f, -1.0f,  0.0f }, glm::vec2{ 0.0f, 1.0f }, 0.0f },
-        Vertex{ glm::vec3{  0.5f, -0.5f, -0.5f }, glm::vec3{ 0.0f, -1.0f,  0.0f }, glm::vec2{ 1.0f, 1.0f }, 0.0f },
         Vertex{ glm::vec3{  0.5f, -0.5f,  0.5f }, glm::vec3{ 0.0f, -1.0f,  0.0f }, glm::vec2{ 1.0f, 0.0f }, 0.0f },
+        Vertex{ glm::vec3{  0.5f, -0.5f, -0.5f }, glm::vec3{ 0.0f, -1.0f,  0.0f }, glm::vec2{ 1.0f, 1.0f }, 0.0f },
+        Vertex{ glm::vec3{ -0.5f, -0.5f, -0.5f }, glm::vec3{ 0.0f, -1.0f,  0.0f }, glm::vec2{ 0.0f, 1.0f }, 0.0f },
         Vertex{ glm::vec3{ -0.5f, -0.5f,  0.5f }, glm::vec3{ 0.0f, -1.0f,  0.0f }, glm::vec2{ 0.0f, 0.0f }, 0.0f },
     };
 
@@ -67,7 +67,7 @@ namespace Vanadium {
                         (float)(z + (position.z * n)) + 0.5f
                     });
 
-                    Vanadium::BlockIndex px = 1, py = 1, pz = 1, nx = 1, ny = 1, nz = 1;
+                    Vanadium::BlockIndex px = 0, py = 0, pz = 0, nx = 0, ny = 0, nz = 0;
 
                     if (x + 1 < n) px = grid[x + 1][y][z];
                     if (y + 1 < n) py = grid[x][y + 1][z];
