@@ -16,4 +16,6 @@ namespace Vanadium {
 		const glm::ivec3& bottom,
 		const glm::ivec3& top
 	);
+
+	BlockIndex GenerateBlock(const glm::ivec3& pos, float noise);
 }

@@ -28,35 +28,7 @@ namespace Vanadium {
                 maxHeight -= (cPos.y * n);
 
                 for (int y = 0; y < n; ++y) {
-                    //if ((cPos.x + cPos.y + cPos.z) % 2 == 0) {
-                    //    grid[x][y][z] = 0;
-                    //}
-                    //else {
-                    //    grid[x][y][z] = 2;
-                    //}
-                    //continue;
-                    // 
-                    //if (x == 0 == z) {
-                    //    grid[x][y][z] = 1;
-                    //}
-
-                    if (y > maxHeight) {
-                        grid[x][y][z] = 0;
-
-                        break;
-                    }
-
-                    if (y == maxHeight) {
-                        grid[x][y][z] = 1;
-                        continue;
-                    }
-
-                    if (y >= maxHeight - 3) {
-                        grid[x][y][z] = 2;
-                        continue;
-                    }
-
-                    grid[x][y][z] = 3;
+                    grid[x][y][z] = GenerateBlock(glm::ivec3{ x, y, z }, (float)maxHeight);
                 }
             }
         }
@@ -97,34 +69,27 @@ namespace Vanadium {
                 maxHeight -= (cPos.y * n);
 
                 for (int y = bottom.y; y < top.y; ++y) {
-                    //if ((cPos.x + cPos.y + cPos.z) % 2 == 0) {
-                    //    grid[x][y][z] = 1;
-                    //}
-                    //else {
-                    //    grid[x][y][z] = 2;
-                    //}
-
-                    if (y > maxHeight) {
-                        grid[x][y][z] = 0;
-
-                        break;
-                    }
-
-                    if (y == maxHeight) {
-                        grid[x][y][z] = 1;
-                        continue;
-                    }
-
-                    if (y >= maxHeight - 3) {
-                        grid[x][y][z] = 2;
-                        continue;
-                    }
-
-                    grid[x][y][z] = 3;
+                    grid[x][y][z] = GenerateBlock(glm::ivec3{ x, y, z }, (float)maxHeight);
                 }
             }
         }
 
         return grid;
+    }
+
+    BlockIndex GenerateBlock(const glm::ivec3& pos, float noise) {
+        if (pos.y > noise) {
+            return 0;
+        }
+
+        if (pos.y == noise) {
+            return 1;
+        }
+
+        if (pos.y >= noise - 3) {
+            return 2;
+        }
+
+        return 3;
     }
 }
