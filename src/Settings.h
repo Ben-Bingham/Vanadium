@@ -7,7 +7,7 @@ namespace Vanadium {
         bool wireframe{ false };
 
         float planetRadius{ 10.0f };
-        bool enableCurvature{ true };
+        bool enableCurvature{ false };
 
         struct Noise {
             siv::PerlinNoise::seed_type seed{ 123456u };
@@ -18,6 +18,9 @@ namespace Vanadium {
             float mean{ 0.0f };
             float xMult{ 1.0f };
             float zMult{ 1.0f };
+
+            float xOffset{ 0.0f };
+            float zOffset{ 0.0f };
         } noise;
     };
 }

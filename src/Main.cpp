@@ -85,11 +85,11 @@ int main() {
     phong.shininess = 32.0;
 
     // Initial Chunk Creation
-    int n = 8;
+    int n = 4;
 
     Vanadium::JobSystem jobSystem{ 8 };
 
-    int chunkDistance = 5; // Number of chunks in each cardinal direction (Including up and down) past the players current chunk
+    int chunkDistance = 2; // Number of chunks in each cardinal direction (Including up and down) past the players current chunk
 
     Vanadium::ChunkPosition chunkCamPosition = Vanadium::ChunkPosition{ glm::floor(cam.position / (float)n) };
 
@@ -100,6 +100,8 @@ int main() {
             }
         }
     }
+
+    //jobSystem.AddJob(Vanadium::Job{ { 0, 0, 0 }, settings, n, 0 });
 
     jobSystem.WaitForCompletion();
 
@@ -190,6 +192,8 @@ int main() {
                 }
             }
 
+            //jobSystem.AddJob(Vanadium::Job{ { 0, 0, 0 }, settings, n, 0 });
+
             chunks.clear();
 
             chunks = jobSystem.GetResults();
@@ -240,27 +244,27 @@ int main() {
         if (chunkCamPosition != lastChunkCamPosition) {
             std::vector<Vanadium::ChunkPosition> allowedChunkPositions{ };
 
-            for (int x = chunkCamPosition.x - chunkDistance; x < chunkCamPosition.x + chunkDistance + 1; ++x) {
-                for (int y = chunkCamPosition.y - chunkDistance; y < chunkCamPosition.y + chunkDistance + 1; ++y) {
-                    for (int z = chunkCamPosition.z - chunkDistance; z < chunkCamPosition.z + chunkDistance + 1; ++z) {
-                        allowedChunkPositions.push_back(Vanadium::ChunkPosition{ x, y, z });
+            //for (int x = chunkCamPosition.x - chunkDistance; x < chunkCamPosition.x + chunkDistance + 1; ++x) {
+            //    for (int y = chunkCamPosition.y - chunkDistance; y < chunkCamPosition.y + chunkDistance + 1; ++y) {
+            //        for (int z = chunkCamPosition.z - chunkDistance; z < chunkCamPosition.z + chunkDistance + 1; ++z) {
+            //            allowedChunkPositions.push_back(Vanadium::ChunkPosition{ x, y, z });
 
-                        if (std::find_if(chunks.begin(), chunks.end(), [&](const auto& c) { return Vanadium::ChunkPosition{ x, y, z } == c.position; }) != chunks.end()) {
-                            continue;
-                        }
+            //            if (std::find_if(chunks.begin(), chunks.end(), [&](const auto& c) { return Vanadium::ChunkPosition{ x, y, z } == c.position; }) != chunks.end()) {
+            //                continue;
+            //            }
 
-                        jobSystem.AddJob(Vanadium::Job{ { x, y, z }, settings, n, 0 });
-                    }
-                }
-            }
+            //            jobSystem.AddJob(Vanadium::Job{ { x, y, z }, settings, n, 0 });
+            //        }
+            //    }
+            //}
 
-            std::erase_if(chunks, [&](const Vanadium::Chunk& c){
-                if (std::find_if(allowedChunkPositions.begin(), allowedChunkPositions.end(), [&](const auto& ch) { return c.position == ch; }) != allowedChunkPositions.end()) {
-                    return false;
-                }
+            //std::erase_if(chunks, [&](const Vanadium::Chunk& c){
+            //    if (std::find_if(allowedChunkPositions.begin(), allowedChunkPositions.end(), [&](const auto& ch) { return c.position == ch; }) != allowedChunkPositions.end()) {
+            //        return false;
+            //    }
 
-                return true;
-            });
+            //    return true;
+            //});
         }
 
         lastCamPos = cam.position;

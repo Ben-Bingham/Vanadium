@@ -56,8 +56,8 @@ namespace Vanadium {
         for (int x = bottom.x; x < top.x; ++x) {
             for (int z = bottom.z; z < top.z; ++z) {
                 double noise = settings.noise.perlin.octave2D_01(
-                    (double)x + ((double)cPos.x * (double)n) * (double)settings.noise.xMult,
-                    (double)z + ((double)cPos.z * (double)n) * (double)settings.noise.zMult,
+                    (double)(x + (int)settings.noise.xOffset) + ((double)cPos.x * (double)n) * (double)settings.noise.xMult,
+                    (double)(z + (int)settings.noise.zOffset) + ((double)cPos.z * (double)n) * (double)settings.noise.zMult,
                     settings.noise.octaves
                 );
 
@@ -78,6 +78,29 @@ namespace Vanadium {
     }
 
     BlockIndex GenerateBlock(const glm::ivec3& pos, const ChunkPosition& cPos, int n, float noise) {
+        glm::ivec3 lPos = pos - (cPos * n);
+
+        //if (lPos == glm::ivec3{ 0, 0, 0 } || lPos == glm::ivec3{ 0, 0, 1 } || lPos == glm::ivec3{ 0, 0, 2 }) {
+        //    return 1;
+        //}
+        //
+        //if (lPos == glm::ivec3{ 0, 1, 0 } || lPos == glm::ivec3{ 0, 1, 2 }) {
+        //    return 1;
+        //}
+        //
+        //if (lPos == glm::ivec3{ 0, 2, 0 } || lPos == glm::ivec3{ 0, 2, 2 }) {
+        //    return 1;
+        //}
+        //
+        //return 0;
+
+        //if (pos == lPos) {
+        //    return 1;
+        //}
+        //
+        //return 0;
+
+
         //if (pos.y >= 5) {
         //    return 0;
         //}
@@ -94,19 +117,26 @@ namespace Vanadium {
         //
         //return 1;
 
+        
+        //if ((pos.x + pos.y + pos.z) % 2 == 0) {
+        //    return 1;
+        //}
+        //
+        //return 0;
+
 
         if (pos.y > noise) {
             return 0;
         }
-
+        
         if (pos.y == noise) {
             return 1;
         }
-
+        
         if (pos.y >= noise - 3) {
             return 2;
         }
-
+        
         return 3;
     }
 }

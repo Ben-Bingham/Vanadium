@@ -53,6 +53,8 @@ namespace Vanadium {
             if (ImGui::SliderFloat("Mean##noise", &settings.noise.mean, -10.0f, 10.0f)) remakeGrid = true;
             if (ImGui::SliderFloat("X Coordinate Multiplier##noise", &settings.noise.xMult, 0.0f, 10.0f)) remakeGrid = true;
             if (ImGui::SliderFloat("Z Coordinate Multiplier##noise", &settings.noise.zMult, 0.0f, 10.0f)) remakeGrid = true;
+            if (ImGui::SliderFloat("X Coordinate Offset##noise", &settings.noise.xOffset, -20.0f, 20.0f)) remakeGrid = true;
+            if (ImGui::SliderFloat("Z Coordinate Offset##noise", &settings.noise.zOffset, -20.0f, 20.0f)) remakeGrid = true;
 
             int s = (int)settings.noise.seed;
             if (ImGui::SliderInt("Seed##noise", &s, 0, (int)std::numeric_limits<int>::max() / 4)) {
