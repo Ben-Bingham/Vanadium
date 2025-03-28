@@ -101,8 +101,6 @@ int main() {
         }
     }
 
-    //jobSystem.AddJob(Vanadium::Job{ { 0, 0, 0 }, settings, n, 0 });
-
     jobSystem.WaitForCompletion();
 
     std::vector<Vanadium::Chunk> chunks = jobSystem.GetResults();
@@ -184,6 +182,8 @@ int main() {
         if (rg) {
             Vanadium::ChunkPosition chunkCamPosition = Vanadium::ChunkPosition{ glm::floor(cam.position / (float)n) };
 
+            jobSystem.ClearJobs();
+
             for (int x = chunkCamPosition.x - chunkDistance; x < chunkCamPosition.x + chunkDistance + 1; ++x) {
                 for (int y = chunkCamPosition.y - chunkDistance; y < chunkCamPosition.y + chunkDistance + 1; ++y) {
                     for (int z = chunkCamPosition.z - chunkDistance; z < chunkCamPosition.z + chunkDistance + 1; ++z) {
@@ -191,8 +191,6 @@ int main() {
                     }
                 }
             }
-
-            //jobSystem.AddJob(Vanadium::Job{ { 0, 0, 0 }, settings, n, 0 });
 
             chunks.clear();
 

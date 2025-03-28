@@ -36,6 +36,27 @@ namespace Vanadium {
 		m_JobsConditionVar.notify_one();
 	}
 
+	void JobSystem::RemoveJob(const Job& j) {
+		{
+			std::unique_lock lock{ m_JobsMutex };
+
+			auto it = std::find_if(m_Jobs.begin(), m_Jobs.end(), [&](const Job& job) { return job.position == j.position; });
+			if (it != m_Jobs.end()) {
+				m_Jobs.erase(it);
+			}
+
+			SortJobs();
+		}
+	}
+
+	void JobSystem::ClearJobs() {
+		{
+			std::unique_lock lock{ m_JobsMutex };
+			
+			m_Jobs.clear();
+		}
+	}
+
 	std::vector<Chunk> JobSystem::GetResults() {
 		std::vector<Chunk> results;
 		{
