@@ -36,6 +36,18 @@ namespace Vanadium {
 		m_JobsConditionVar.notify_one();
 	}
 
+	void JobSystem::AddJobs(const std::vector<Job>& jobs) {
+		{
+			std::unique_lock lock{ m_JobsMutex };
+
+			m_Jobs.insert(m_Jobs.end(), jobs.begin(), jobs.end());
+
+			SortJobs();
+		}
+
+		m_JobsConditionVar.notify_all();
+	}
+
 	void JobSystem::RemoveJob(const Job& j) {
 		{
 			std::unique_lock lock{ m_JobsMutex };

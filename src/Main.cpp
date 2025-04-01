@@ -89,58 +89,38 @@ int main() {
 
     Vanadium::JobSystem jobSystem{ 8 };
 
-    int chunkDistance = 2; // Number of chunks in each cardinal direction (Including up and down) past the players current chunk
+    int chunkDistance = 8; // Number of chunks in each cardinal direction (Including up and down) past the players current chunk
 
-    Vanadium::ChunkPosition chunkCamPosition = Vanadium::ChunkPosition{ glm::floor(cam.position / (float)n) };
+    Vanadium::ChunkPosition cameraChunkPosition{ glm::floor(cam.position / (float)n) };
+    Vanadium::ChunkPosition lastFrameCameraChunkPosition = cameraChunkPosition;
 
-    for (int x = chunkCamPosition.x - chunkDistance; x < chunkCamPosition.x + chunkDistance + 1; ++x) {
-        for (int y = chunkCamPosition.y - chunkDistance; y < chunkCamPosition.y + chunkDistance + 1; ++y) {
-            for (int z = chunkCamPosition.z - chunkDistance; z < chunkCamPosition.z + chunkDistance + 1; ++z) {
+    std::vector<Vanadium::Job> jobs;
+    for (int x = cameraChunkPosition.x - chunkDistance; x < cameraChunkPosition.x + chunkDistance + 1; ++x) {
+        for (int y = cameraChunkPosition.y - chunkDistance; y < cameraChunkPosition.y + chunkDistance + 1; ++y) {
+            for (int z = cameraChunkPosition.z - chunkDistance; z < cameraChunkPosition.z + chunkDistance + 1; ++z) {
                 Vanadium::ChunkPosition cPos = { x, y, z };
 
-                int manhattenDistance = (int)std::abs(cPos.x - chunkCamPosition.x) + (int)std::abs(cPos.y - chunkCamPosition.y) + (int)std::abs(cPos.z - chunkCamPosition.z);
+                int manhattenDistance = (int)std::abs(cPos.x - cameraChunkPosition.x) + (int)std::abs(cPos.y - cameraChunkPosition.y) + (int)std::abs(cPos.z - cameraChunkPosition.z);
 
-                Vanadium::ChunkPosition furthestChunk{ chunkCamPosition + chunkDistance };
-                int maxManhattenDistance = (int)std::abs(furthestChunk.x - chunkCamPosition.x) + (int)std::abs(furthestChunk.y - chunkCamPosition.y) + (int)std::abs(furthestChunk.z - chunkCamPosition.z);
+                Vanadium::ChunkPosition furthestChunk{ cameraChunkPosition + chunkDistance };
+                int maxManhattenDistance = (int)std::abs(furthestChunk.x - cameraChunkPosition.x) + (int)std::abs(furthestChunk.y - cameraChunkPosition.y) + (int)std::abs(furthestChunk.z - cameraChunkPosition.z);
 
                 size_t priority = (size_t)(maxManhattenDistance - manhattenDistance);
 
-                jobSystem.AddJob(Vanadium::Job{ cPos, settings, n, priority });
+                jobs.push_back(Vanadium::Job{ cPos, settings, n, priority });
             }
         }
     }
 
-    jobSystem.WaitForCompletion();
+    jobSystem.AddJobs(jobs);
 
-    std::vector<Vanadium::Chunk> chunks = jobSystem.GetResults();
-
-    for (auto& chunk : chunks) {
-        chunk.vao = std::make_unique<VertexAttributeObject>();
-        chunk.vbo = std::make_unique<VertexBufferObject>();
-        chunk.ebo = std::make_unique<ElementBufferObject>();
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vanadium::Vertex), (void*)0);
-        glEnableVertexAttribArray(0);
-
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vanadium::Vertex), (void*)(3 * sizeof(float)));
-        glEnableVertexAttribArray(1);
-
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vanadium::Vertex), (void*)(6 * sizeof(float)));
-        glEnableVertexAttribArray(2);
-
-        glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(Vanadium::Vertex), (void*)(8 * sizeof(float)));
-        glEnableVertexAttribArray(3);
-
-        chunk.vao->Bind();
-        chunk.vbo->UpdateData(Vanadium::VerticesAsFloatVector(chunk.geometry.vertices));
-        chunk.ebo->UpdateData(chunk.geometry.indices);
-    }
+    std::vector<Vanadium::Chunk> chunks{ };
 
     mainShader.Bind();
     mainShader.SetFloat("radius", settings.planetRadius);
     mainShader.SetInt("enableCurvature", settings.enableCurvature);
 
-    glm::vec3 lastCamPos = cam.position;
+    glm::vec3 lastFrameCamPos = cam.position;
 
     float lastFrame{ 0.0f };
     while (!glfwWindowShouldClose(window->handle)) {
@@ -189,25 +169,28 @@ int main() {
 
         // Remaking all chunks due to updated settings
         if (rg) {
-            Vanadium::ChunkPosition chunkCamPosition = Vanadium::ChunkPosition{ glm::floor(cam.position / (float)n) };
-
             jobSystem.ClearJobs();
 
-            for (int x = chunkCamPosition.x - chunkDistance; x < chunkCamPosition.x + chunkDistance + 1; ++x) {
-                for (int y = chunkCamPosition.y - chunkDistance; y < chunkCamPosition.y + chunkDistance + 1; ++y) {
-                    for (int z = chunkCamPosition.z - chunkDistance; z < chunkCamPosition.z + chunkDistance + 1; ++z) {
+            std::vector<Vanadium::Job> jobs;
+            for (int x = cameraChunkPosition.x - chunkDistance; x < cameraChunkPosition.x + chunkDistance + 1; ++x) {
+                for (int y = cameraChunkPosition.y - chunkDistance; y < cameraChunkPosition.y + chunkDistance + 1; ++y) {
+                    for (int z = cameraChunkPosition.z - chunkDistance; z < cameraChunkPosition.z + chunkDistance + 1; ++z) {
                         Vanadium::ChunkPosition cPos = { x, y, z };
 
-                        int manhattenDistance = (int)std::abs(cPos.x - chunkCamPosition.x) + (int)std::abs(cPos.y - chunkCamPosition.y) + (int)std::abs(cPos.z - chunkCamPosition.z);
+                        int manhattenDistance = (int)std::abs(cPos.x - cameraChunkPosition.x) + (int)std::abs(cPos.y - cameraChunkPosition.y) + (int)std::abs(cPos.z - cameraChunkPosition.z);
 
-                        Vanadium::ChunkPosition furthestChunk{ chunkCamPosition + chunkDistance };
-                        int maxManhattenDistance = (int)std::abs(furthestChunk.x - chunkCamPosition.x) + (int)std::abs(furthestChunk.y - chunkCamPosition.y) + (int)std::abs(furthestChunk.z - chunkCamPosition.z);
+                        Vanadium::ChunkPosition furthestChunk{ cameraChunkPosition + chunkDistance };
+                        int maxManhattenDistance = (int)std::abs(furthestChunk.x - cameraChunkPosition.x) + (int)std::abs(furthestChunk.y - cameraChunkPosition.y) + (int)std::abs(furthestChunk.z - cameraChunkPosition.z);
 
                         size_t priority = (size_t)(maxManhattenDistance - manhattenDistance);
 
-                        jobSystem.AddJob(Vanadium::Job{ cPos, settings, n, priority });
+                        jobs.push_back(Vanadium::Job{ cPos, settings, n, priority });
                     }
                 }
+            }
+
+            if (!jobs.empty()) {
+                jobSystem.AddJobs(jobs);
             }
 
             chunks.clear();
@@ -252,17 +235,18 @@ int main() {
         if (glfwGetKey(window->handle, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) cam.position -= cam.up * cam.movementSpeed * dt;
 
         // Chunk Boundry Crossing
-        Vanadium::ChunkPosition chunkCamPosition = Vanadium::ChunkPosition{ glm::floor(cam.position / (float)n) };
-        Vanadium::ChunkPosition lastChunkCamPosition = Vanadium::ChunkPosition{ glm::floor(lastCamPos / (float)n) };
+        cameraChunkPosition = Vanadium::ChunkPosition{ glm::floor(cam.position / (float)n) };
 
         //Vanadium::ChunkPosition delta = chunkCamPosition - lastChunkCamPosition; // TODO
 
-        if (chunkCamPosition != lastChunkCamPosition) {
+        if (cameraChunkPosition != lastFrameCameraChunkPosition) {
+            double st1 = glfwGetTime();
             std::vector<Vanadium::ChunkPosition> allowedChunkPositions{ };
 
-            for (int x = chunkCamPosition.x - chunkDistance; x < chunkCamPosition.x + chunkDistance + 1; ++x) {
-                for (int y = chunkCamPosition.y - chunkDistance; y < chunkCamPosition.y + chunkDistance + 1; ++y) {
-                    for (int z = chunkCamPosition.z - chunkDistance; z < chunkCamPosition.z + chunkDistance + 1; ++z) {
+            std::vector<Vanadium::Job> jobs;
+            for (int x = cameraChunkPosition.x - chunkDistance; x < cameraChunkPosition.x + chunkDistance + 1; ++x) {
+                for (int y = cameraChunkPosition.y - chunkDistance; y < cameraChunkPosition.y + chunkDistance + 1; ++y) {
+                    for (int z = cameraChunkPosition.z - chunkDistance; z < cameraChunkPosition.z + chunkDistance + 1; ++z) {
                         allowedChunkPositions.push_back(Vanadium::ChunkPosition{ x, y, z });
 
                         if (std::find_if(chunks.begin(), chunks.end(), [&](const auto& c) { return Vanadium::ChunkPosition{ x, y, z } == c.position; }) != chunks.end()) {
@@ -271,17 +255,27 @@ int main() {
 
                         Vanadium::ChunkPosition cPos = { x, y, z };
 
-                        int manhattenDistance = (int)std::abs(cPos.x - chunkCamPosition.x) + (int)std::abs(cPos.y - chunkCamPosition.y) + (int)std::abs(cPos.z - chunkCamPosition.z);
+                        int manhattenDistance = (int)std::abs(cPos.x - cameraChunkPosition.x) + (int)std::abs(cPos.y - cameraChunkPosition.y) + (int)std::abs(cPos.z - cameraChunkPosition.z);
 
-                        Vanadium::ChunkPosition furthestChunk{ chunkCamPosition + chunkDistance };
-                        int maxManhattenDistance = (int)std::abs(furthestChunk.x - chunkCamPosition.x) + (int)std::abs(furthestChunk.y - chunkCamPosition.y) + (int)std::abs(furthestChunk.z - chunkCamPosition.z);
+                        Vanadium::ChunkPosition furthestChunk{ cameraChunkPosition + chunkDistance };
+                        int maxManhattenDistance = (int)std::abs(furthestChunk.x - cameraChunkPosition.x) + (int)std::abs(furthestChunk.y - cameraChunkPosition.y) + (int)std::abs(furthestChunk.z - cameraChunkPosition.z);
 
                         size_t priority = (size_t)(maxManhattenDistance - manhattenDistance);
 
-                        jobSystem.AddJob(Vanadium::Job{ cPos, settings, n, priority });
+                        jobs.push_back(Vanadium::Job{ cPos, settings, n, priority });
                     }
                 }
             }
+
+            std::cout << "1: " << glfwGetTime() - st1 << std::endl;
+            double st2 = glfwGetTime();
+
+            if (!jobs.empty()) {
+                jobSystem.AddJobs(jobs);
+            }
+
+            std::cout << "2: " << glfwGetTime() - st2 << std::endl;
+            double st3 = glfwGetTime();
 
             std::erase_if(chunks, [&](const Vanadium::Chunk& c){
                 if (std::find_if(allowedChunkPositions.begin(), allowedChunkPositions.end(), [&](const auto& ch) { return c.position == ch; }) != allowedChunkPositions.end()) {
@@ -290,9 +284,12 @@ int main() {
 
                 return true;
             });
+
+            std::cout << "3: " << glfwGetTime() - st3 << std::endl;
         }
 
-        lastCamPos = cam.position;
+        lastFrameCamPos = cam.position;
+        lastFrameCameraChunkPosition = cameraChunkPosition;
 
         // Prep for rendering
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);

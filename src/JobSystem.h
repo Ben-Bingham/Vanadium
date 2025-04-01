@@ -26,6 +26,7 @@ namespace Vanadium {
 		~JobSystem();
 
 		void AddJob(const Job& j);
+		void AddJobs(const std::vector<Job>& jobs);
 		void RemoveJob(const Job& j);
 		void ClearJobs();
 
