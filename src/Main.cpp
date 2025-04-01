@@ -260,27 +260,36 @@ int main() {
         if (chunkCamPosition != lastChunkCamPosition) {
             std::vector<Vanadium::ChunkPosition> allowedChunkPositions{ };
 
-            //for (int x = chunkCamPosition.x - chunkDistance; x < chunkCamPosition.x + chunkDistance + 1; ++x) {
-            //    for (int y = chunkCamPosition.y - chunkDistance; y < chunkCamPosition.y + chunkDistance + 1; ++y) {
-            //        for (int z = chunkCamPosition.z - chunkDistance; z < chunkCamPosition.z + chunkDistance + 1; ++z) {
-            //            allowedChunkPositions.push_back(Vanadium::ChunkPosition{ x, y, z });
+            for (int x = chunkCamPosition.x - chunkDistance; x < chunkCamPosition.x + chunkDistance + 1; ++x) {
+                for (int y = chunkCamPosition.y - chunkDistance; y < chunkCamPosition.y + chunkDistance + 1; ++y) {
+                    for (int z = chunkCamPosition.z - chunkDistance; z < chunkCamPosition.z + chunkDistance + 1; ++z) {
+                        allowedChunkPositions.push_back(Vanadium::ChunkPosition{ x, y, z });
 
-            //            if (std::find_if(chunks.begin(), chunks.end(), [&](const auto& c) { return Vanadium::ChunkPosition{ x, y, z } == c.position; }) != chunks.end()) {
-            //                continue;
-            //            }
+                        if (std::find_if(chunks.begin(), chunks.end(), [&](const auto& c) { return Vanadium::ChunkPosition{ x, y, z } == c.position; }) != chunks.end()) {
+                            continue;
+                        }
 
-            //            jobSystem.AddJob(Vanadium::Job{ { x, y, z }, settings, n, 0 });
-            //        }
-            //    }
-            //}
+                        Vanadium::ChunkPosition cPos = { x, y, z };
 
-            //std::erase_if(chunks, [&](const Vanadium::Chunk& c){
-            //    if (std::find_if(allowedChunkPositions.begin(), allowedChunkPositions.end(), [&](const auto& ch) { return c.position == ch; }) != allowedChunkPositions.end()) {
-            //        return false;
-            //    }
+                        int manhattenDistance = (int)std::abs(cPos.x - chunkCamPosition.x) + (int)std::abs(cPos.y - chunkCamPosition.y) + (int)std::abs(cPos.z - chunkCamPosition.z);
 
-            //    return true;
-            //});
+                        Vanadium::ChunkPosition furthestChunk{ chunkCamPosition + chunkDistance };
+                        int maxManhattenDistance = (int)std::abs(furthestChunk.x - chunkCamPosition.x) + (int)std::abs(furthestChunk.y - chunkCamPosition.y) + (int)std::abs(furthestChunk.z - chunkCamPosition.z);
+
+                        size_t priority = (size_t)(maxManhattenDistance - manhattenDistance);
+
+                        jobSystem.AddJob(Vanadium::Job{ cPos, settings, n, priority });
+                    }
+                }
+            }
+
+            std::erase_if(chunks, [&](const Vanadium::Chunk& c){
+                if (std::find_if(allowedChunkPositions.begin(), allowedChunkPositions.end(), [&](const auto& ch) { return c.position == ch; }) != allowedChunkPositions.end()) {
+                    return false;
+                }
+
+                return true;
+            });
         }
 
         lastCamPos = cam.position;
