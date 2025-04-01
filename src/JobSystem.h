@@ -36,6 +36,7 @@ namespace Vanadium {
 	private:
 		void ThreadLoop();
 
+		// Must be called only by threads that own m_JobsMutex
 		void SortJobs();
 
 		std::mutex m_JobsMutex;

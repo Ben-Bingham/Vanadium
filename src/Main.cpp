@@ -96,7 +96,16 @@ int main() {
     for (int x = chunkCamPosition.x - chunkDistance; x < chunkCamPosition.x + chunkDistance + 1; ++x) {
         for (int y = chunkCamPosition.y - chunkDistance; y < chunkCamPosition.y + chunkDistance + 1; ++y) {
             for (int z = chunkCamPosition.z - chunkDistance; z < chunkCamPosition.z + chunkDistance + 1; ++z) {
-                jobSystem.AddJob(Vanadium::Job{ { x, y, z }, settings, n, 0 });
+                Vanadium::ChunkPosition cPos = { x, y, z };
+
+                int manhattenDistance = (int)std::abs(cPos.x - chunkCamPosition.x) + (int)std::abs(cPos.y - chunkCamPosition.y) + (int)std::abs(cPos.z - chunkCamPosition.z);
+
+                Vanadium::ChunkPosition furthestChunk{ chunkCamPosition + chunkDistance };
+                int maxManhattenDistance = (int)std::abs(furthestChunk.x - chunkCamPosition.x) + (int)std::abs(furthestChunk.y - chunkCamPosition.y) + (int)std::abs(furthestChunk.z - chunkCamPosition.z);
+
+                size_t priority = (size_t)(maxManhattenDistance - manhattenDistance);
+
+                jobSystem.AddJob(Vanadium::Job{ cPos, settings, n, priority });
             }
         }
     }
@@ -187,7 +196,16 @@ int main() {
             for (int x = chunkCamPosition.x - chunkDistance; x < chunkCamPosition.x + chunkDistance + 1; ++x) {
                 for (int y = chunkCamPosition.y - chunkDistance; y < chunkCamPosition.y + chunkDistance + 1; ++y) {
                     for (int z = chunkCamPosition.z - chunkDistance; z < chunkCamPosition.z + chunkDistance + 1; ++z) {
-                        jobSystem.AddJob(Vanadium::Job{ { x, y, z }, settings, n, 0 });
+                        Vanadium::ChunkPosition cPos = { x, y, z };
+
+                        int manhattenDistance = (int)std::abs(cPos.x - chunkCamPosition.x) + (int)std::abs(cPos.y - chunkCamPosition.y) + (int)std::abs(cPos.z - chunkCamPosition.z);
+
+                        Vanadium::ChunkPosition furthestChunk{ chunkCamPosition + chunkDistance };
+                        int maxManhattenDistance = (int)std::abs(furthestChunk.x - chunkCamPosition.x) + (int)std::abs(furthestChunk.y - chunkCamPosition.y) + (int)std::abs(furthestChunk.z - chunkCamPosition.z);
+
+                        size_t priority = (size_t)(maxManhattenDistance - manhattenDistance);
+
+                        jobSystem.AddJob(Vanadium::Job{ cPos, settings, n, priority });
                     }
                 }
             }

@@ -154,6 +154,6 @@ namespace Vanadium {
 	}
 
 	void JobSystem::SortJobs() {
-
+		std::sort(m_Jobs.begin(), m_Jobs.end(), [](const Job& j1, const Job& j2) { return j1.priority < j2.priority; });
 	}
 }
