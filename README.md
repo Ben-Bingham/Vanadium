@@ -1,5 +1,5 @@
 # Vanadium
-### A work in progress chunk based voxel rendering engine
+### A chunk based voxel rendering engine
 
 ![alt text](https://github.com/Ben-Bingham/Vanadium/raw/main/gallery/default.png "A voxel world")
 
